@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#100e0c">
+<meta name="color-scheme" content="dark">
+<title>All or Nothing</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314100e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' fill='%23e4b85c' font-family='Georgia,serif'%3EA%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg0: #100e0c;
+    --bg1: #1a1612;
+    --bg2: #241e18;
+    --bg3: #2c251e;
+    --ink: #f6efe2;
+    --muted: #cbbba4;
+    --faint: #9c8d78;
+    --gold: #e4b85c;
+    --gold-ink: #24180a;
+    --line: rgba(228, 184, 92, 0.28);
+    --line-strong: rgba(228, 184, 92, 0.62);
+    --good: #c5e2ae;
+    --good-bg: #1c2918;
+    --good-line: rgba(197, 226, 174, 0.7);
+    --bad: #f0b0a2;
+    --bad-bg: #321c18;
+    --bad-line: rgba(240, 176, 162, 0.75);
+    --serif: "Liberation Serif", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+    --sans: Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { font-size: 18px; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    color: var(--ink);
+    font-family: var(--sans);
+    background:
+      radial-gradient(1100px 640px at 50% -12%, #3a2d1e 0%, transparent 58%),
+      radial-gradient(700px 480px at 110% 110%, #2a1c14 0%, transparent 46%),
+      var(--bg0);
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  button:disabled { cursor: default; opacity: 0.55; }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  ::selection { background: var(--gold); color: var(--gold-ink); }
+
+  .wrap {
+    width: min(580px, 100%);
+    margin: 0 auto;
+    padding: 18px 16px calc(28px + env(safe-area-inset-bottom));
+  }
+  .slim {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .slim.hot { color: var(--gold); font-weight: 700; }
+
+  .kicker {
+    margin: 0 0 6px;
+    color: var(--gold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 650;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(2.3rem, 9vw, 3.15rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+  .deck {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+  .rule {
+    height: 1px;
+    margin: 18px 0;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.7;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .stat {
+    background: rgba(20, 16, 12, 0.55);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px 8px 9px;
+    text-align: center;
+  }
+  .stat b {
+    display: block;
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1.1;
+  }
+  .stat span {
+    display: block;
+    margin-top: 2px;
+    color: var(--faint);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .stat.hot b { color: #f3d48a; }
+
+  .seg {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 4px;
+    background: #14110e;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    margin: 14px 0 8px;
+  }
+  .seg button {
+    min-height: 48px;
+    border: 0;
+    border-radius: 11px;
+    background: transparent;
+    color: var(--muted);
+  }
+  .seg button[aria-pressed="true"] {
+    background: var(--gold);
+    color: var(--gold-ink);
+    font-weight: 700;
+  }
+
+  .fine {
+    margin: 8px 0 16px;
+    color: var(--faint);
+    font-size: 0.82rem;
+  }
+
+  .modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .mode {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    min-height: 72px;
+    padding: 10px 10px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, #2b241c, #201b16);
+    box-shadow: var(--shadow);
+  }
+  .mode.wide {
+    grid-column: 1 / -1;
+    min-height: 60px;
+  }
+  .mode:active { transform: translateY(1px); }
+  .mode .num {
+    flex: 0 0 auto;
+    width: 1.3rem;
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    color: var(--gold);
+  }
+  .mode .name { display: block; font-weight: 700; font-size: 0.95rem; line-height: 1.15; }
+  .mode .blurb { display: block; color: var(--muted); font-size: 0.75rem; margin-top: 2px; line-height: 1.25; }
+  .mode .badge {
+    margin-left: auto;
+    background: var(--gold);
+    color: var(--gold-ink);
+    border-radius: 999px;
+    min-width: 1.8rem;
+    height: 1.8rem;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0 8px;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .nav h2 {
+    margin: 0;
+    flex: 1;
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+  .ghost, .primary, .goodbtn, .badbtn, .choice, .chip, .linkish {
+    border-radius: 14px;
+    min-height: 52px;
+    padding: 12px 14px;
+  }
+  .ghost {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+  }
+  .primary {
+    background: var(--gold);
+    color: var(--gold-ink);
+    border: 0;
+    font-weight: 700;
+    width: 100%;
+  }
+  .primary:active, .ghost:active, .choice:active { transform: translateY(1px); }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+  .linkish {
+    background: transparent;
+    border: 0;
+    color: var(--faint);
+    min-height: 44px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .progress {
+    height: 6px;
+    background: #2a241c;
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 4px 0 14px;
+  }
+  .progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #a67c3d, var(--gold));
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--faint);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card {
+    background: linear-gradient(180deg, #2a231c, #1d1914);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 18px 16px 16px;
+    box-shadow: var(--shadow);
+  }
+  .card .tag {
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    margin: 0 0 8px;
+  }
+  .word {
+    font-family: var(--serif);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+    font-size: clamp(1.85rem, 7vw, 2.5rem);
+    margin: 4px 0 6px;
+  }
+  .face .word { font-size: clamp(2.2rem, 8vw, 3.15rem); }
+  .pos { color: var(--muted); margin: 0 0 8px; font-family: var(--serif); }
+  .prompt {
+    font-family: var(--serif);
+    font-size: 1.18rem;
+    line-height: 1.45;
+    margin: 8px 0 0;
+  }
+  .hint { color: var(--faint); font-size: 0.86rem; margin: 10px 0 0; }
+
+  .flip { perspective: 1200px; }
+  .flip-inner {
+    display: grid;
+    transform-style: preserve-3d;
+    transition: transform 0.45s ease;
+    min-height: 340px;
+  }
+  .flip.is-flipped .flip-inner { transform: rotateY(180deg); }
+  .face {
+    grid-area: 1 / 1;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+  }
+  .face.back { transform: rotateY(180deg); }
+  .flip:not(.is-flipped) .face.back { pointer-events: none; }
+  .flip.is-flipped .face.front { pointer-events: none; }
+  .tapnote { color: var(--faint); margin-top: 18px; font-size: 0.9rem; }
+
+  .def {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    line-height: 1.4;
+    margin: 0 0 8px;
+  }
+  .rootchip {
+    display: inline-block;
+    margin: 8px 0;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    color: var(--gold);
+    font-size: 0.86rem;
+  }
+  .example {
+    margin: 10px 0 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--gold);
+    color: var(--muted);
+    font-family: var(--serif);
+    line-height: 1.45;
+  }
+  .note { color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
+
+  .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .choice {
+    width: 100%;
+    text-align: left;
+    background: #16130f;
+    border: 1px solid var(--line);
+    line-height: 1.35;
+  }
+  .choice.is-right { background: var(--good-bg); border-color: var(--good-line); color: var(--good); }
+  .choice.is-wrong { background: var(--bad-bg); border-color: var(--bad-line); color: var(--bad); }
+  .choice:disabled { opacity: 1; }
+  .choice .letter {
+    display: inline-block;
+    width: 1.4rem;
+    color: var(--gold);
+    font-family: var(--serif);
+  }
+
+  .feedback {
+    margin-top: 12px;
+    border-radius: 16px;
+    padding: 14px;
+    line-height: 1.45;
+  }
+  .feedback p { margin: 0; }
+  .feedback .fk {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+  .feedback.good { background: var(--good-bg); border: 1px solid var(--good-line); }
+  .feedback.good .fk { color: var(--good); }
+  .feedback.bad { background: var(--bad-bg); border: 1px solid var(--bad-line); }
+  .feedback.bad .fk { color: var(--bad); }
+  .actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 0 calc(6px + env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, rgba(16, 14, 12, 0), #100e0c 32%);
+  }
+
+  .blankbox {
+    width: 100%;
+    margin-top: 14px;
+    background: #120f0c;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 16px;
+    font-family: var(--serif);
+    font-size: 1.15rem;
+  }
+  .gap {
+    display: inline-block;
+    min-width: 7.2rem;
+    border-bottom: 2px solid var(--gold);
+    color: var(--gold);
+    font-weight: 700;
+    padding: 0 4px;
+  }
+
+  .search {
+    width: 100%;
+    margin: 8px 0 14px;
+    background: #120f0c;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    min-height: 52px;
+    padding: 12px 14px;
+    font-size: 1rem;
+  }
+
+  .lesson-head {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    margin: 18px 0 8px;
+  }
+  .root-block { margin: 0 0 16px; }
+  .root-head h3 {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--gold);
+  }
+  .root-head p { margin: 2px 0; color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
+  .wordbtn {
+    width: 100%;
+    text-align: left;
+    margin-top: 8px;
+    background: #1c1814;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 12px;
+    min-height: 58px;
+  }
+  .wordbtn .w {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .wordbtn .s { color: var(--faint); font-size: 0.8rem; margin-left: 8px; }
+  .detail {
+    padding: 4px 8px 10px;
+    color: var(--muted);
+    font-family: var(--serif);
+    line-height: 1.45;
+  }
+  .detail p { margin: 6px 0; }
+  .pill {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid var(--line);
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .match-label {
+    margin: 12px 0 6px;
+    color: var(--faint);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .chip {
+    width: 100%;
+    text-align: left;
+    background: #16130f;
+    border: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .chip small { display: block; color: var(--muted); font-size: 0.82rem; }
+  .chip.on { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+  .chip.right { background: var(--good-bg); border-color: var(--good-line); }
+  .chip.wrong { background: var(--bad-bg); border-color: var(--bad-line); }
+  .chip:disabled { opacity: 1; }
+
+  .end-score {
+    font-family: var(--serif);
+    font-size: 3rem;
+    margin: 6px 0;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .foot {
+    margin-top: 18px;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .flip-inner { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const KEY = "all-or-nothing-v1";
+
+const ROOTS = [
+  { id: "PAN", lesson: 3, name: "PAN", lang: "Greek", meaning: "all", parts: "PAN", familiar: ["Pan-American", "pancreas", "panorama"], challenge: ["pandemic", "panegyric", "pantheism", "pantheon"] },
+  { id: "OMNIS", lesson: 3, name: "OMNIS", lang: "Latin", meaning: "all", parts: "OMNIS", familiar: [], challenge: ["omnibus", "omniscient"] },
+  { id: "HOLOS", lesson: 3, name: "HOLOS", lang: "Greek", meaning: "whole", parts: "HOLOS", familiar: [], challenge: ["holistic", "hologram", "holograph"] },
+  { id: "TOTUS", lesson: 3, name: "TOTUS", lang: "Latin", meaning: "whole", parts: "TOTUS", familiar: ["total", "totally"], challenge: ["totality"] },
+  { id: "CLAUDO", lesson: 3, name: "CLAUDO", lang: "Latin", meaning: "to close", parts: "CLAUDO, CLAUDERE, CLAUSI, CLAUSUM", familiar: ["clause", "close", "closet", "conclude", "exclude", "include", "seclude"], challenge: ["cloisonné", "occlude"] },
+  { id: "INCIPIO", lesson: 4, name: "INCIPIO", lang: "Latin", meaning: "to begin", parts: "INCIPIO, INCIPERE, INCEPI, INCEPTUM", familiar: [], challenge: ["incipit"] },
+  { id: "NIHIL", lesson: 4, name: "NIHIL", lang: "Latin", meaning: "nothing", parts: "NIHIL", familiar: ["nil"], challenge: [] },
+  { id: "NEGO", lesson: 4, name: "NEGO", lang: "Latin", meaning: "to deny", parts: "NEGO, NEGARE, NEGAVI, NEGATUM", familiar: ["deny", "negative", "negotiate"], challenge: ["abnegate", "renege"] },
+  { id: "VANUS", lesson: 4, name: "VANUS", lang: "Latin", meaning: "empty", parts: "VANUS", familiar: ["avoid", "evacuate", "vain", "vacation", "vacuum", "void"], challenge: ["devoid", "vacate"], note: "VANUS and VACUUS both mean empty. Vanity and vaunt come from VANUS." },
+  { id: "VACUUS", lesson: 4, name: "VACUUS", lang: "Latin", meaning: "empty", parts: "VACUUS", familiar: ["avoid", "evacuate", "vain", "vacation", "vacuum", "void"], challenge: ["devoid", "vacate"], note: "VACUUS means empty. Vacuous comes from VACUUS, not from VANUS." },
+  { id: "APERIO", lesson: 4, name: "APERIO", lang: "Latin", meaning: "to open", parts: "APERIO, APERIRE, APERUI, APERTUM", familiar: ["overture"], challenge: ["apéritif"] }
+];
+
+const WORDS = [
+  { word: "pandemonium", lesson: 3, pos: "n.", defs: ["Uproar."], examples: ["Pandemonium threatens to break out after Julius Caesar is assassinated on the ides of March, but in Shakespeare's play Brutus calms the murderous senators."], forms: [], root: "PAN" },
+  { word: "panacea", lesson: 3, pos: "n.", defs: ["A cure-all for diseases or troubles."], examples: ["Some politicians seem to regard tax cuts as a panacea for economic problems."], forms: [], root: "PAN" },
+  { word: "omnipotent", lesson: 3, pos: "adj.", defs: ["Having unlimited power; all-powerful."], examples: ["To the ancient British tribes the invading Roman army seemed omnipotent."], forms: ["omnipotence", "the Omnipotent", "omnipotently"], root: "OMNIS" },
+  { word: "omnipresent", lesson: 3, pos: "adj.", defs: ["Present everywhere."], examples: ["At harvest time the smell of garlic is omnipresent in Gilroy, California, the garlic capital of America."], forms: [], root: "OMNIS" },
+  { word: "omnivorous", lesson: 3, pos: "adj.", defs: ["Feeding on both plants and meat.", "Devouring everything, especially intellectually."], examples: ["Human beings are omnivorous, though many choose to be vegetarians.", "She is such an omnivorous reader she has already read all of the library's biographies, science fiction, and sports magazines."], forms: ["omnivore", "omnivorously", "omnivorousness"], root: "OMNIS" },
+  { word: "catholic", lesson: 3, pos: "adj.", defs: ["Universal; including most things.", "Capitalized: referring to the Roman Catholic Church."], examples: ["Her wide travels reflect her catholic tastes.", "Spain is a predominantly Catholic country."], forms: ["catholic (noun)", "catholically"], root: "HOLOS", note: "Lowercase catholic means universal. Capitalized Catholic means the Roman Catholic Church." },
+  { word: "holocaust", lesson: 3, pos: "n.", defs: ["A great destruction, especially by fire.", "Capitalized: the murder by the Nazis of over six million Jews and millions of other people in World War II."], examples: ["The 1906 San Francisco earthquake and fire was a holocaust that destroyed much of the city.", "Elie Wiesel wrote about surviving the Holocaust."], forms: ["holocaustal", "holocaustic"], root: "HOLOS", note: "Lowercase holocaust means a great destruction, especially by fire. The historical Holocaust is capitalized." },
+  { word: "totalitarian", lesson: 3, pos: "adj.", defs: ["Referring to a form of government in which one person or party holds absolute control."], examples: ["Joseph Stalin's Soviet Union was a totalitarian state."], forms: ["totalitarianism"], root: "TOTUS" },
+  { word: "cloister", lesson: 3, pos: "n. / tr. v.", defs: ["A covered walk along the inside walls of a building, usually looking out on a courtyard.", "A monastery or similar place of religious seclusion.", "To seclude as in a monastery."], examples: ["Monks walked and prayed in the cloister.", "Parents tried to cloister their children from the plague."], forms: ["cloistered"], root: "CLAUDO" },
+  { word: "preclude", lesson: 3, pos: "tr. v.", defs: ["To prevent; to make impossible."], examples: ["Rain precluded taking a walk."], forms: ["preclusion", "preclusive"], root: "CLAUDO" },
+  { word: "recluse", lesson: 3, pos: "n.", defs: ["A person who avoids mixing with people."], examples: ["He preferred the company of a dog and a library and lived as a recluse."], forms: ["reclusion", "reclusive"], root: "CLAUDO" },
+  { word: "inception", lesson: 4, pos: "n.", defs: ["The beginning of something."], examples: ["Since the inception of a vaccine for polio, that disease has almost disappeared from the earth."], forms: [], root: "INCIPIO" },
+  { word: "incipient", lesson: 4, pos: "adj.", defs: ["In its early stages; beginning."], examples: ["A sore throat and runny nose are the symptoms of an incipient cold."], forms: ["incipiently"], root: "INCIPIO", challenge: true },
+  { word: "annihilate", lesson: 4, pos: "tr. v.", defs: ["To destroy completely."], examples: ["During the radio broadcast of The War of the Worlds, thousands of listeners thought Martians were about to annihilate New Jersey."], forms: ["annihilable", "annihilation", "annihilator"], root: "NIHIL", note: "A listed synonym is decimate." },
+  { word: "nihilism", lesson: 4, pos: "n.", defs: ["The total rejection of religious or moral beliefs."], examples: ["From the point of view of nihilism, any behavior is acceptable since no rules of ethics exist."], forms: ["nihilist", "nihilistic", "nihility"], root: "NIHIL" },
+  { word: "negate", lesson: 4, pos: "tr. v.", defs: ["To disprove; to nullify.", "To rule out; to cancel; to repeal."], examples: ["Columbus's voyage to the New World negated the theory that the earth was flat.", "The legislation allowing eighteen year olds to vote negated previous laws that had set the voting age at twenty-one or older."], forms: ["negation"], root: "NEGO" },
+  { word: "renegade", lesson: 4, pos: "n. / adj.", defs: ["One who deserts a group, cause, faith, or similar bond; an outlaw.", "Like a renegade; traitorous."], examples: ["When Democrats lost the election, many former supporters turned renegade and joined the Republicans.", "Loyal troops crushed the revolt and imprisoned renegade officers."], forms: [], root: "NEGO" },
+  { word: "vacuous", lesson: 4, pos: "adj.", defs: ["Empty, especially of meaning or purpose."], examples: ["Educators often criticize television cartoons for kids as vacuous entertainment."], forms: ["vacuity"], root: "VACUUS" },
+  { word: "vanity", lesson: 4, pos: "n.", defs: ["Conceit, especially about one's appearance.", "Something worthless or useless.", "A dressing table."], examples: ["Despite the vanity of the Spanish royal family, Francisco Goya painted their portraits showing all their physical and moral shortcomings.", "Buddhism teaches that human ambitions are vanity.", "A vanity usually has an attached mirror and many drawers."], forms: [], root: "VANUS" },
+  { word: "vaunt", lesson: 4, pos: "tr. v. / n.", defs: ["To boast; to brag about.", "A boast."], examples: ["Gracious winners do not vaunt their victories.", "Parents' vaunts about their possessions often embarrass their children."], forms: ["vaunted"], root: "VANUS" },
+  { word: "aperture", lesson: 4, pos: "n.", defs: ["An opening, especially one that admits light."], examples: ["The photographer adjusted the aperture of the lens to let in more light."], forms: [], root: "APERIO" },
+  { word: "overt", lesson: 4, pos: "adj.", defs: ["Done or shown openly."], examples: ["Their overt hostility gave us little hope for a reconciliation."], forms: ["overtly"], root: "APERIO" }
+];
+
+const CONFUSABLES = {
+  pandemonium: ["holocaust", "panacea", "vanity"],
+  panacea: ["pandemonium", "aperture", "preclude"],
+  omnipotent: ["omnipresent", "omnivorous", "totalitarian"],
+  omnipresent: ["omnipotent", "overt", "catholic"],
+  omnivorous: ["omnipotent", "omnipresent", "vacuous"],
+  catholic: ["holocaust", "totalitarian", "cloister"],
+  holocaust: ["pandemonium", "nihilism", "panacea"],
+  totalitarian: ["omnipotent", "renegade", "recluse"],
+  cloister: ["recluse", "preclude", "vanity"],
+  preclude: ["negate", "annihilate", "cloister"],
+  recluse: ["renegade", "cloister", "nihilism"],
+  inception: ["incipient", "aperture", "overt"],
+  incipient: ["inception", "overt", "vacuous"],
+  annihilate: ["negate", "preclude", "vaunt"],
+  nihilism: ["vanity", "negate", "annihilate"],
+  negate: ["annihilate", "preclude", "vaunt"],
+  renegade: ["recluse", "nihilism", "overt"],
+  vacuous: ["vanity", "overt", "incipient"],
+  vanity: ["vaunt", "vacuous", "panacea"],
+  vaunt: ["vanity", "negate", "overt"],
+  aperture: ["overt", "cloister", "inception"],
+  overt: ["vacuous", "incipient", "aperture"]
+};
+
+const SYNONYMS = [
+  { word: "overt", base: "overt", answer: "obvious", wrong: ["hidden", "fierce", "early"], explain: "Overt means done or shown openly, so obvious is closest." },
+  { word: "aperture", base: "aperture", answer: "opening", wrong: ["a closed wall", "a clue", "a courtyard"], explain: "An aperture is an opening, especially one that lets in light." },
+  { word: "vacuous", base: "vacuous", answer: "pointless", wrong: ["meaningful", "innocent", "loud"], explain: "Vacuous means empty of meaning or purpose. Pointless is closest." },
+  { word: "omnipresent", base: "omnipresent", answer: "ever-present", wrong: ["all-powerful", "rare", "hidden"], explain: "Omnipresent means present everywhere." },
+  { word: "panacea", base: "panacea", answer: "cure-all", wrong: ["a snack", "uproar", "a shelter"], explain: "A panacea is a cure-all for diseases or troubles." },
+  { word: "omnivorous", base: "omnivorous", answer: "plant-and-meat-eating", wrong: ["grass-eating only", "meat-eating only", "shy"], explain: "Omnivorous means feeding on both plants and meat." },
+  { word: "totalitarianism", base: "totalitarian", answer: "complete control by one person", wrong: ["shared power", "a quiet peace", "a common goal"], explain: "Totalitarianism is rule in which one person or party holds absolute control." },
+  { word: "pandemonium", base: "pandemonium", answer: "uproar", wrong: ["silence", "a cure", "a beginning"], explain: "Pandemonium means uproar." },
+  { word: "omnipotent", base: "omnipotent", answer: "all-powerful", wrong: ["present everywhere", "powerless", "hidden"], explain: "Omnipotent means having unlimited power." },
+  { word: "catholic", base: "catholic", answer: "universal", wrong: ["narrow", "secret", "Protestant"], explain: "Lowercase catholic means universal, including most things." },
+  { word: "holocaust", base: "holocaust", answer: "destruction by fire", wrong: ["a small repair", "a boast", "a beginning"], explain: "A holocaust is a great destruction, especially by fire." },
+  { word: "cloister", base: "cloister", answer: "seclude", wrong: ["invite everyone in", "boast", "begin"], explain: "To cloister is to seclude, as in a monastery." },
+  { word: "preclude", base: "preclude", answer: "prevent", wrong: ["make possible", "show openly", "destroy completely"], explain: "Preclude means to prevent or make impossible." },
+  { word: "recluse", base: "recluse", answer: "a person who avoids others", wrong: ["a social host", "a traitor", "a cure-all"], explain: "A recluse avoids mixing with people." },
+  { word: "inception", base: "inception", answer: "beginning", wrong: ["ending", "a boast", "a lens opening"], explain: "Inception means the beginning of something." },
+  { word: "incipient", base: "incipient", answer: "just starting", wrong: ["concluding", "obvious", "all-powerful"], explain: "Incipient means in its early stages." },
+  { word: "annihilate", base: "annihilate", answer: "destroy completely", wrong: ["build", "begin", "boast"], explain: "Annihilate means to destroy completely. A listed synonym is decimate." },
+  { word: "nihilism", base: "nihilism", answer: "rejection of moral beliefs", wrong: ["strong moral faith", "a great fire", "a boast"], explain: "Nihilism is the total rejection of religious or moral beliefs." },
+  { word: "negate", base: "negate", answer: "cancel", wrong: ["confirm", "begin", "open"], explain: "Negate means to disprove, cancel, or repeal." },
+  { word: "renegade", base: "renegade", answer: "deserter", wrong: ["a loyal follower", "a recluse", "a host"], explain: "A renegade deserts a group, cause, or faith." },
+  { word: "vanity", base: "vanity", answer: "conceit", wrong: ["humility", "uproar", "an opening"], explain: "Vanity can mean conceit, especially about appearance." },
+  { word: "vaunt", base: "vaunt", answer: "boast", wrong: ["stay quiet", "prevent", "begin"], explain: "To vaunt is to boast or brag." }
+];
+
+const ANTONYMS = [
+  { word: "incipient", base: "incipient", answer: "concluding", wrong: ["just starting", "rainy", "dramatic"], explain: "Incipient means just beginning. Concluding is an ending." },
+  { word: "renegade", base: "renegade", answer: "faithful", wrong: ["traitorous", "wounded", "boastful"], explain: "A renegade deserts a cause. Faithful is the opposite." },
+  { word: "inception", base: "inception", answer: "break-up", wrong: ["conception", "purpose", "a beginning"], explain: "Inception means a beginning. A break-up is an ending. Conception is another kind of start, not an opposite." },
+  { word: "preclude", base: "preclude", answer: "make possible", wrong: ["prevent", "keep secret", "postpone"], explain: "Preclude means to make impossible. Make possible is the opposite." },
+  { word: "catholic (universal)", base: "catholic", answer: "narrow", wrong: ["universal", "broad", "wide"], explain: "In the universal sense, catholic means including most things. Narrow is the opposite." },
+  { word: "reclusive", base: "recluse", answer: "outgoing", wrong: ["exclusive", "shy", "hidden"], explain: "Reclusive means avoiding people. Outgoing is the opposite." },
+  { word: "omnipotent", base: "omnipotent", answer: "defenseless", wrong: ["all-powerful", "forceful", "well-trained"], explain: "Omnipotent means all-powerful. Defenseless is the opposite." },
+  { word: "pandemonium", base: "pandemonium", answer: "quiet", wrong: ["uproar", "excitement", "hostility"], explain: "Pandemonium is uproar. Quiet is the opposite." },
+  { word: "overt", base: "overt", answer: "secret", wrong: ["obvious", "open", "public"], explain: "Overt means shown openly. Secret is the opposite." },
+  { word: "vacuous", base: "vacuous", answer: "meaningful", wrong: ["pointless", "empty", "silly"], explain: "Vacuous means empty of meaning. Meaningful is the opposite." },
+  { word: "annihilate", base: "annihilate", answer: "create", wrong: ["destroy", "erase", "ruin"], explain: "Annihilate means to destroy completely. Create is an opposite." },
+  { word: "negate", base: "negate", answer: "confirm", wrong: ["cancel", "deny", "repeal"], explain: "Negate means to disprove or cancel. Confirm is the opposite." },
+  { word: "vanity", base: "vanity", answer: "humility", wrong: ["conceit", "pride", "a mirror"], explain: "One meaning of vanity is conceit. Humility is the opposite." },
+  { word: "omnipresent", base: "omnipresent", answer: "absent", wrong: ["ever-present", "everywhere", "nearby"], explain: "Omnipresent means present everywhere. Absent is the opposite." },
+  { word: "vaunt", base: "vaunt", answer: "downplay", wrong: ["boast", "brag", "show off"], explain: "Vaunt means to boast. Downplay is the opposite." }
+];
+
+const BLANKS = [
+  { uid: "blank:panacea", lesson: 3, sentence: "Penicillin was once regarded as a _____ that would end all infectious diseases.", accept: ["panacea"], show: "panacea", explain: "A panacea is a cure-all. Penicillin was treated as a cure for every infection." },
+  { uid: "blank:recluse", lesson: 3, sentence: "Elizabeth Barrett was regarded as a _____ too fragile for company.", accept: ["recluse"], show: "recluse", explain: "A recluse avoids mixing with people." },
+  { uid: "blank:holocaust", lesson: 3, sentence: "In *Night* Elie Wiesel records how he survived the _____ as a twelve-year-old Jewish boy in a Nazi concentration camp.", accept: ["holocaust"], show: "Holocaust", capital: true, explain: "This sentence is about the historical Holocaust, so it takes a capital H." },
+  { uid: "blank:omnipotence", lesson: 3, sentence: "Originally regarded as a god with absolute authority over the Aztecs, Montezuma's reputation for _____ was destroyed by the Spanish invasion.", accept: ["omnipotence"], show: "omnipotence", near: { omnipotent: "Close. Omnipotent is the adjective. This sentence needs the noun omnipotence." }, explain: "Omnipotence is unlimited power, the noun form of omnipotent." },
+  { uid: "blank:pandemonium", lesson: 3, sentence: "Because we had held so many drills, there was no _____ when a real fire broke out, and everyone left the building calmly.", accept: ["pandemonium"], show: "pandemonium", explain: "Pandemonium means uproar. The drills kept panic from breaking out." },
+  { uid: "blank:cloister", lesson: 3, sentence: "Although Rapunzel was _____ in a high tower to hide her beauty, her long hair served as a ladder for her rescuer.", accept: ["cloistered", "cloister"], show: "cloistered", explain: "Cloistered means secluded, as in a monastery. Cloister and cloistered both count." },
+  { uid: "blank:omnipresent", lesson: 3, sentence: "As the team dressed before the track meet, tension was _____ in the locker room.", accept: ["omnipresent"], show: "omnipresent", explain: "Omnipresent means present everywhere. The tension filled the room." },
+  { uid: "blank:annihilate", lesson: 4, sentence: "All wildlife was _____ by the forest fire.", accept: ["annihilated", "annihilate"], show: "annihilated", near: { annihilation: "Close. Annihilation is the noun. The verb here is annihilated." }, explain: "Annihilate means to destroy completely. Annihilated and annihilate both count." },
+  { uid: "blank:vaunt", lesson: 4, sentence: "We grew weary of hearing her _____ her athletic achievements.", accept: ["vaunting", "vaunt", "vaunted", "vaunts"], show: "vaunting", explain: "To vaunt is to boast. Vaunting, vaunt, vaunts, and vaunted all count." },
+  { uid: "blank:inception", lesson: 4, sentence: "Since its _____ in 1945, the United Nations has been the subject of controversy.", accept: ["inception"], show: "inception", explain: "Inception means the beginning of something." },
+  { uid: "blank:incipient", lesson: 4, sentence: "The new students were easily identifiable by their _____ self-consciousness on the first day of school.", accept: ["incipient"], show: "incipient", explain: "Incipient means just beginning, in its early stages." },
+  { uid: "blank:aperture", lesson: 4, sentence: "Smoke from the cooking fire escaped through an _____ at the top of the tepee.", accept: ["aperture"], show: "aperture", explain: "An aperture is an opening, especially one that lets something through." },
+  { uid: "blank:nihilist", lesson: 4, sentence: "A _____ believes that neither ethical nor religious rules can govern human behavior.", accept: ["nihilist"], show: "nihilist", near: { nihilism: "Close. Nihilism is the belief. This sentence needs the person: nihilist.", nihilistic: "Close. The sentence needs the noun for a person: nihilist." }, explain: "A nihilist rejects religious or moral rules. Nihilism is the belief itself." },
+  { uid: "blank:renegade", lesson: 4, sentence: "Following the American Civil War, Southern farmers were often threatened by bushwhackers, _____ soldiers who had deserted the army.", accept: ["renegade"], show: "renegade", near: { renegades: "Close. Before the noun soldiers, use the adjective renegade." }, explain: "A renegade deserts a group or cause. Here it describes the soldiers." }
+];
+
+const USAGE = [
+  {
+    uid: "usage:vanity", lesson: 4, word: "vanity",
+    explain: "Vanity is a noun. It can mean conceit, something worthless, or a dressing table. It is not a verb. To brag, use vaunt.",
+    wrongWhy: "He tried to vanity his trophy. Vanity cannot be used as a verb.",
+    options: [
+      { text: "Her vanity about her new haircut made her late for class.", bad: false },
+      { text: "The old story calls fame and riches a vanity that fades.", bad: false },
+      { text: "She set a small mirror on the vanity beside the bed.", bad: false },
+      { text: "He tried to vanity his trophy by telling the whole team.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:holocaust", lesson: 3, word: "holocaust",
+    explain: "Holocaust is a noun: a great destruction, especially by fire, or the historical Holocaust. It is not a verb.",
+    wrongWhy: "Holocausting is not a word. You cannot use holocaust as a verb.",
+    options: [
+      { text: "The barn fire became a holocaust that leveled the farm.", bad: false },
+      { text: "The class read survivor accounts of the Holocaust.", bad: false },
+      { text: "They spent the afternoon holocausting the old shed to clear the lot.", bad: true },
+      { text: "A holocaust of flame followed the lightning strike on the dry hill.", bad: false }
+    ]
+  },
+  {
+    uid: "usage:vacuous", lesson: 4, word: "vacuous",
+    explain: "Vacuous and vacuity mean empty of meaning or purpose, not a physical hole.",
+    wrongWhy: "A gap between fence boards is a physical space, not vacuity.",
+    options: [
+      { text: "The speech was vacuous, full of slogans and empty of ideas.", bad: false },
+      { text: "He left early because the party talk was vacuous.", bad: false },
+      { text: "Critics called the show vacuous entertainment.", bad: false },
+      { text: "Wind rushed through the vacuity between the two fence boards.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:nihilism", lesson: 4, word: "nihilism",
+    explain: "Nihilism is the total rejection of religious or moral beliefs. It is not a word for debt or ruin.",
+    wrongWhy: "A failed shop is a money problem. That is not nihilism.",
+    options: [
+      { text: "Nihilism claims that moral rules do not bind anyone.", bad: false },
+      { text: "A nihilist may reject both religious and ethical duties.", bad: false },
+      { text: "After the shop failed, they said the family faced nihilism.", bad: true },
+      { text: "Those nihilistic essays argue that traditional morals are hollow.", bad: false }
+    ]
+  },
+  {
+    uid: "usage:omnivorous", lesson: 3, word: "omnivorous",
+    explain: "Omnivorous means feeding on plants and meat, or devouring everything intellectually. It does not mean being good at two school subjects.",
+    wrongWhy: "A student who is good at math and art is not an omnivore.",
+    options: [
+      { text: "Bears are omnivorous and eat berries, fish, and insects.", bad: false },
+      { text: "An omnivorous reader finishes novels, news, and science books.", bad: false },
+      { text: "Omnivores have teeth that can handle both plants and meat.", bad: false },
+      { text: "A true omnivore is simply a student who is good at both math and art.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:catholic", lesson: 3, word: "catholic",
+    explain: "Lowercase catholic means universal, including most things. Capitalized Catholic refers to the Roman Catholic Church. It does not mean picky.",
+    wrongWhy: "Eating only carrots is narrow. Catholic tastes include most things.",
+    options: [
+      { text: "Her catholic taste in music runs from opera to folk songs.", bad: false },
+      { text: "Because his interests are so catholic, he tries every club at school.", bad: false },
+      { text: "Spain is a largely Catholic country.", bad: false },
+      { text: "She is catholic about vegetables and will eat only carrots.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:preclude", lesson: 3, word: "preclude",
+    explain: "Preclude means to prevent or make impossible.",
+    wrongWhy: "Warm sunshine does not prevent a picnic, so precluded is the wrong word.",
+    options: [
+      { text: "A locked gate precluded a shortcut through the yard.", bad: false },
+      { text: "Heavy snow precluded the soccer game.", bad: false },
+      { text: "The posted warning precludes any claim that nobody told them.", bad: false },
+      { text: "Warm sunshine precluded the picnic, so everyone stayed inside.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:overt", lesson: 4, word: "overt",
+    explain: "Overt means done or shown openly.",
+    wrongWhy: "A secret kept in a locked diary is hidden, which is the opposite of overt.",
+    options: [
+      { text: "Their overt dislike showed in every rude remark.", bad: false },
+      { text: "The plan was overt, posted on the board for all to see.", bad: false },
+      { text: "He overtly refused the offer in front of the class.", bad: false },
+      { text: "She kept her overt secret hidden in a locked diary.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:renegade", lesson: 4, word: "renegade",
+    explain: "A renegade deserts a group, cause, or faith. Faithful is an antonym.",
+    wrongWhy: "Someone who keeps every promise is faithful, not a renegade.",
+    options: [
+      { text: "The renegade left the team and played for the rival school.", bad: false },
+      { text: "Renegade soldiers refused the orders of their own officers.", bad: false },
+      { text: "They called him a renegade after he abandoned the cause.", bad: false },
+      { text: "A renegade keeps every promise to the group.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:panacea", lesson: 3, word: "panacea",
+    explain: "A panacea is a cure-all, not a remedy for one rare problem.",
+    wrongWhy: "A cure for a single rare symptom is not a panacea.",
+    options: [
+      { text: "There is no panacea that fixes every problem at school.", bad: false },
+      { text: "The ad sold the juice as a panacea for all illness.", bad: false },
+      { text: "Extra sleep helps, but it is not a panacea.", bad: false },
+      { text: "A panacea is a cure that works for only one rare symptom.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:cloister", lesson: 3, word: "cloister",
+    explain: "A cloister is a covered walk or a place of seclusion. To cloister is to seclude.",
+    wrongWhy: "Inviting the whole town in is the opposite of secluding people.",
+    options: [
+      { text: "Monks walked and prayed in the cloister beside the courtyard.", bad: false },
+      { text: "The family tried to cloister the child from every worry.", bad: false },
+      { text: "During the epidemic many students were cloistered at home.", bad: false },
+      { text: "The open market cloistered shoppers by inviting the whole town in.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:annihilate", lesson: 4, word: "annihilate",
+    explain: "Annihilate means to destroy completely.",
+    wrongWhy: "Adding one comma does not destroy a story completely.",
+    options: [
+      { text: "The late frost annihilated the tomato plants.", bad: false },
+      { text: "They feared the storm would annihilate the pier.", bad: false },
+      { text: "The invasion nearly annihilated the small fleet.", bad: false },
+      { text: "The editor annihilated the story by adding a single comma.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:vaunt", lesson: 4, word: "vaunt",
+    explain: "Vaunt means to boast, or a boast.",
+    wrongWhy: "Hiding a good grade is not bragging.",
+    options: [
+      { text: "She began to vaunt the medal the moment she left the podium.", bad: false },
+      { text: "His vaunts about the new bike embarrassed his friends.", bad: false },
+      { text: "A gracious captain does not vaunt a win in the other team's face.", bad: false },
+      { text: "Quiet students vaunt when they hide a good grade from the class.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:negate", lesson: 4, word: "negate",
+    explain: "Negate means to disprove, cancel, or repeal.",
+    wrongWhy: "Proving a result true confirms it. That does not negate it.",
+    options: [
+      { text: "The new measurement negated the old theory.", bad: false },
+      { text: "A veto can negate a bill before it becomes a law.", bad: false },
+      { text: "One calm fact can negate a wild rumor.", bad: false },
+      { text: "The chart negated the result by proving it was true.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:incipient", lesson: 4, word: "incipient",
+    explain: "Incipient means in its early stages, just beginning.",
+    wrongWhy: "The last chapter is an ending, not a beginning.",
+    options: [
+      { text: "A scratchy throat can be the sign of an incipient cold.", bad: false },
+      { text: "The incipient storm was only a dark line on the horizon.", bad: false },
+      { text: "Her incipient smile faded when the bell rang.", bad: false },
+      { text: "The incipient chapter is the last one, after the story is over.", bad: true }
+    ]
+  },
+  {
+    uid: "usage:aperture", lesson: 4, word: "aperture",
+    explain: "An aperture is an opening, especially one that admits light.",
+    wrongWhy: "A solid door with no gap is not an opening.",
+    options: [
+      { text: "She widened the aperture so the lens could gather more light.", bad: false },
+      { text: "Smoke left the tent through a small aperture at the top.", bad: false },
+      { text: "Stars showed through an aperture in the clouds.", bad: false },
+      { text: "The solid steel door was one wide aperture that blocked every draft.", bad: true }
+    ]
+  }
+];
+
+const TWIN = {
+  PAN: "OMNIS",
+  OMNIS: "PAN",
+  HOLOS: "TOTUS",
+  TOTUS: "HOLOS",
+  VANUS: "VACUUS",
+  VACUUS: "VANUS",
+  CLAUDO: "APERIO",
+  APERIO: "CLAUDO",
+  NIHIL: "NEGO",
+  NEGO: "NIHIL",
+  INCIPIO: "APERIO"
+};
+
+const LETTERS = ["A", "B", "C", "D"];
+
+function rootById(id) { return ROOTS.find((r) => r.id === id); }
+function wordByName(name) { return WORDS.find((w) => w.word === name); }
+
+function defaultSave() {
+  return {
+    known: {},
+    missed: [],
+    stats: { correct: 0, attempted: 0, streak: 0, bestStreak: 0 },
+    lesson: "both"
+  };
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return defaultSave();
+    const data = JSON.parse(raw);
+    const base = defaultSave();
+    return {
+      known: data.known || {},
+      missed: Array.isArray(data.missed) ? data.missed : [],
+      stats: Object.assign(base.stats, data.stats || {}),
+      lesson: data.lesson || "both"
+    };
+  } catch (err) {
+    return defaultSave();
+  }
+}
+
+let save = load();
+let sessionScore = 0;
+let decks = { mc: [] };
+let pushed = false;
+
+const ui = {
+  screen: "home",
+  mode: "home",
+  title: "",
+  queue: [],
+  index: 0,
+  flipped: false,
+  picked: null,
+  answered: false,
+  feedback: null,
+  roundCorrect: 0,
+  roundTotal: 0,
+  blank: "",
+  practice: false,
+  openWord: null,
+  query: "",
+  match: null,
+  note: ""
+};
+
+function persist() {
+  try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (err) { /* ignore quota */ }
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+function rich(text) {
+  return String(text).split(/(\*[^*]+\*)/g).map((part) => {
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+      return "<em>" + esc(part.slice(1, -1)) + "</em>";
+    }
+    return esc(part);
+  }).join("");
+}
+
+function shuffle(list) {
+  const a = list.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+  }
+  return a;
+}
+
+function lessonOn(lesson) {
+  return save.lesson === "both" || String(save.lesson) === String(lesson);
+}
+
+function scopedWords() {
+  return WORDS.filter((w) => lessonOn(w.lesson));
+}
+
+function knownCount() {
+  return scopedWords().filter((w) => save.known[w.word] === "known").length;
+}
+
+function missedInScope() {
+  return save.missed.filter((item) => lessonOn(item.lesson));
+}
+
+function rootLabel(id) {
+  const r = rootById(id);
+  return r.name + " · " + r.meaning;
+}
+
+function rootExplain(word, id) {
+  const r = rootById(id);
+  let text = word + " comes from " + r.name + ", " + r.lang + " for \"" + r.meaning + ".\"";
+  if (id === "VANUS" || id === "VACUUS") {
+    text += " VANUS and VACUUS both mean empty, but they are different roots.";
+  }
+  if (id === "PAN" || id === "OMNIS") {
+    text += " PAN is Greek and OMNIS is Latin. Both mean all.";
+  }
+  if (id === "HOLOS" || id === "TOTUS") {
+    text += " HOLOS is Greek and TOTUS is Latin. Both mean whole.";
+  }
+  return text;
+}
+
+function normalizeAnswer(raw) {
+  return String(raw || "").trim().replace(/\s+/g, " ").replace(/[.?!]+$/g, "");
+}
+
+function gradeBlank(item, raw) {
+  const cleaned = normalizeAnswer(raw);
+  if (!cleaned) return { empty: true };
+  const folded = cleaned.toLowerCase().replace(/^the\s+/, "");
+  if (item.near && item.near[folded]) {
+    return { ok: false, text: item.near[folded] + " " + item.explain };
+  }
+  if (!item.accept.includes(folded)) {
+    return { ok: false, text: "The answer is " + item.show + ". " + item.explain };
+  }
+  if (item.capital) {
+    const core = cleaned.replace(/^the\s+/i, "");
+    if (!core || core[0] !== "H") {
+      return { ok: false, text: "Almost. Capitalize the historical event: Holocaust. " + item.explain };
+    }
+  }
+  return { ok: true, text: item.explain };
+}
+
+function filledSentence(item) {
+  return item.sentence.replace("_____", item.show);
+}
+
+function record(ok, missItem) {
+  save.stats.attempted += 1;
+  ui.roundTotal += 1;
+  if (ok) {
+    save.stats.correct += 1;
+    save.stats.streak += 1;
+    sessionScore += 1;
+    ui.roundCorrect += 1;
+    if (save.stats.streak > save.stats.bestStreak) save.stats.bestStreak = save.stats.streak;
+    if (missItem) save.missed = save.missed.filter((m) => m.uid !== missItem.uid);
+  } else {
+    save.stats.streak = 0;
+    if (missItem && !save.missed.some((m) => m.uid === missItem.uid)) save.missed.push(missItem);
+  }
+  persist();
+}
+
+function feedbackKicker(ok) {
+  if (!ok) return "Not quite";
+  if (save.stats.streak >= 3) return "Correct, streak of " + save.stats.streak;
+  return "Correct";
+}
+
+function setFeedback(ok, text) {
+  ui.answered = true;
+  ui.feedback = { ok: ok, kicker: feedbackKicker(ok), text: text };
+}
+
+function choiceList(answer, wrong) {
+  return shuffle([answer].concat(wrong)).map((text) => ({ text: text, answer: text === answer }));
+}
+
+function distractorWords(answer, pool) {
+  const names = pool.map((w) => w.word).filter((w) => w !== answer);
+  const preferred = CONFUSABLES[answer] || [];
+  const out = [];
+  preferred.forEach((name) => {
+    if (name !== answer && !out.includes(name) && (names.includes(name) || wordByName(name))) out.push(name);
+  });
+  shuffle(names).forEach((name) => {
+    if (out.length < 3 && !out.includes(name)) out.push(name);
+  });
+  if (out.length < 3) {
+    shuffle(WORDS.map((w) => w.word)).forEach((name) => {
+      if (out.length < 3 && name !== answer && !out.includes(name)) out.push(name);
+    });
+  }
+  return out.slice(0, 3);
+}
+
+function makeDefQuestion(w, def, suffix) {
+  const pool = WORDS.filter((other) => other.lesson === w.lesson);
+  const wrong = distractorWords(w.word, pool);
+  return {
+    uid: "mc:def:" + w.word + (suffix || ""),
+    mode: "mc",
+    lesson: w.lesson,
+    kind: "Definition",
+    heading: "Which word fits?",
+    word: "",
+    prompt: def,
+    choices: choiceList(w.word, wrong),
+    answer: w.word,
+    explain: w.word + " : " + def + " " + rootExplain(w.word, w.root)
+  };
+}
+
+function makePhraseQuestion(spec, kind, heading) {
+  const base = wordByName(spec.base);
+  return {
+    uid: "mc:" + kind.toLowerCase() + ":" + spec.word,
+    mode: "mc",
+    lesson: base.lesson,
+    kind: kind,
+    heading: heading,
+    word: spec.word,
+    prompt: "",
+    choices: choiceList(spec.answer, spec.wrong),
+    answer: spec.answer,
+    explain: spec.explain
+  };
+}
+
+function makeRootQuestion(w) {
+  const correct = rootLabel(w.root);
+  const ids = [w.root];
+  const twin = TWIN[w.root];
+  if (twin) ids.push(twin);
+  shuffle(ROOTS.map((r) => r.id).filter((id) => !ids.includes(id))).forEach((id) => {
+    if (ids.length < 4) ids.push(id);
+  });
+  const labels = ids.map(rootLabel);
+  return {
+    uid: "roots:" + w.word,
+    mode: "mc",
+    lesson: w.lesson,
+    kind: "Root",
+    heading: "Which root does this word come from?",
+    word: w.word,
+    prompt: "",
+    choices: choiceList(correct, labels.filter((label) => label !== correct)),
+    answer: correct,
+    explain: rootExplain(w.word, w.root)
+  };
+}
+
+function buildMcPool() {
+  const words = scopedWords();
+  const items = [];
+  words.forEach((w) => {
+    items.push(makeDefQuestion(w, w.defs[0], ""));
+    if (w.defs[1] && w.word !== "catholic") items.push(makeDefQuestion(w, w.defs[1], ":2"));
+    if (w.word === "vanity" && w.defs[2]) items.push(makeDefQuestion(w, w.defs[2], ":3"));
+  });
+  SYNONYMS.forEach((spec) => {
+    const base = wordByName(spec.base);
+    if (base && lessonOn(base.lesson)) items.push(makePhraseQuestion(spec, "Synonym", "Which is closest in meaning?"));
+  });
+  ANTONYMS.forEach((spec) => {
+    const base = wordByName(spec.base);
+    if (base && lessonOn(base.lesson)) items.push(makePhraseQuestion(spec, "Antonym", "Which is most nearly the opposite?"));
+  });
+  return items;
+}
+
+function drawMc() {
+  if (!decks.mc.length) {
+    const all = buildMcPool();
+    const groups = ["Definition", "Synonym", "Antonym"].map((kind) => shuffle(all.filter((item) => item.kind === kind)));
+    const mixed = [];
+    const max = groups.reduce((n, list) => Math.max(n, list.length), 0);
+    for (let i = 0; i < max; i++) {
+      groups.forEach((list) => { if (list[i]) mixed.push(list[i]); });
+    }
+    decks.mc = mixed;
+  }
+  return decks.mc.splice(0, Math.min(10, decks.mc.length));
+}
+
+function buildFlash() {
+  return shuffle(scopedWords()).map((w) => ({
+    uid: "flash:" + w.word,
+    mode: "flash",
+    lesson: w.lesson,
+    word: w.word
+  }));
+}
+
+function buildBlanks() {
+  return shuffle(BLANKS.filter((item) => lessonOn(item.lesson)).map((item) => Object.assign({ mode: "blank" }, item)));
+}
+
+function buildUsage() {
+  return shuffle(USAGE.filter((item) => lessonOn(item.lesson))).map((item) => ({
+    uid: item.uid,
+    mode: "usage",
+    lesson: item.lesson,
+    word: item.word,
+    explain: item.explain,
+    wrongWhy: item.wrongWhy,
+    options: shuffle(item.options.map((opt) => Object.assign({}, opt)))
+  }));
+}
+
+function buildRootSets() {
+  let pool = shuffle(scopedWords());
+  const rounds = [];
+  while (pool.length) {
+    const round = [];
+    const used = new Set();
+    const remain = [];
+    pool.forEach((w) => {
+      if (round.length < 4 && !used.has(w.root)) {
+        round.push(w);
+        used.add(w.root);
+      } else remain.push(w);
+    });
+    rounds.push({
+      uid: "rootset:" + round.map((w) => w.word).join("-"),
+      mode: "roots",
+      lesson: save.lesson,
+      pairs: round.map((w) => ({ word: w.word, root: w.root, lesson: w.lesson }))
+    });
+    pool = remain;
+  }
+  return rounds;
+}
+
+function freshMatch(item) {
+  ui.match = {
+    words: shuffle(item.pairs.map((p) => Object.assign({ state: "open" }, p))),
+    roots: shuffle(item.pairs.map((p) => ({ id: p.root, state: "open", word: "" }))),
+    selected: null
+  };
+  ui.note = "";
+}
+
+function startMode(mode, practice) {
+  if (mode === "study") {
+    ui.mode = "study";
+    ui.screen = "study";
+    ui.title = "Study";
+    ui.query = "";
+    ui.openWord = null;
+    rememberPlace();
+    render();
+    return;
+  }
+  ui.practice = !!practice || mode === "practice";
+  ui.mode = mode;
+  ui.index = 0;
+  ui.flipped = false;
+  ui.picked = null;
+  ui.answered = false;
+  ui.feedback = null;
+  ui.roundCorrect = 0;
+  ui.roundTotal = 0;
+  ui.blank = "";
+  ui.note = "";
+  ui.match = null;
+  if (ui.practice) {
+    ui.title = "Practice";
+    ui.queue = shuffle(missedInScope().map((item) => Object.assign({}, item)));
+  } else if (mode === "flash") {
+    ui.title = "Flashcards";
+    ui.queue = buildFlash();
+  } else if (mode === "mc") {
+    ui.title = "Multiple choice";
+    ui.queue = drawMc();
+  } else if (mode === "blank") {
+    ui.title = "Fill in the blank";
+    ui.queue = buildBlanks();
+  } else if (mode === "usage") {
+    ui.title = "Usage judge";
+    ui.queue = buildUsage();
+  } else if (mode === "roots") {
+    ui.title = "Root match";
+    ui.queue = buildRootSets();
+  } else {
+    ui.queue = [];
+  }
+  if (!ui.queue.length) {
+    ui.screen = "empty";
+  } else {
+    ui.screen = "play";
+    if (ui.queue[0].mode === "roots") freshMatch(ui.queue[0]);
+  }
+  rememberPlace();
+  render();
+}
+
+function showHome() {
+  ui.screen = "home";
+  ui.mode = "home";
+  ui.feedback = null;
+  ui.answered = false;
+  render();
+}
+
+function rememberPlace() {
+  if (pushed) return;
+  try {
+    history.pushState({ mode: true }, "");
+    pushed = true;
+  } catch (err) {
+    pushed = false;
+  }
+}
+
+function goHome() {
+  if (pushed) {
+    pushed = false;
+    try {
+      history.back();
+      return;
+    } catch (err) { /* file pages may block history */ }
+  }
+  showHome();
+}
+
+function currentItem() {
+  return ui.queue[ui.index];
+}
+
+function advance() {
+  ui.index += 1;
+  ui.flipped = false;
+  ui.picked = null;
+  ui.answered = false;
+  ui.feedback = null;
+  ui.blank = "";
+  ui.note = "";
+  ui.match = null;
+  if (ui.index >= ui.queue.length) {
+    ui.screen = "results";
+  } else if (currentItem().mode === "roots") {
+    freshMatch(currentItem());
+  }
+  render();
+}
+
+function onChoose(choiceIndex) {
+  if (ui.answered) return;
+  const item = currentItem();
+  const choice = item.choices[choiceIndex];
+  ui.picked = choiceIndex;
+  const ok = !!choice.answer;
+  record(ok, item);
+  const lead = ok ? item.explain : "The answer is " + item.answer + ". " + item.explain;
+  setFeedback(ok, lead);
+  render();
+}
+
+function onUsage(optIndex) {
+  if (ui.answered) return;
+  const item = currentItem();
+  const opt = item.options[optIndex];
+  ui.picked = optIndex;
+  const ok = !!opt.bad;
+  record(ok, item);
+  const text = ok
+    ? item.wrongWhy + " " + item.explain
+    : "Not that one. " + item.wrongWhy + " " + item.explain;
+  setFeedback(ok, text);
+  render();
+}
+
+function onBlank() {
+  if (ui.answered) return;
+  const item = currentItem();
+  const result = gradeBlank(item, ui.blank);
+  if (result.empty) return;
+  record(result.ok, item);
+  const sentence = filledSentence(item);
+  setFeedback(result.ok, result.text + " " + sentence.replace(/\*/g, ""));
+  render();
+}
+
+function onKnow(kind) {
+  const item = currentItem();
+  const name = item.word;
+  save.known[name] = kind;
+  if (kind === "known") save.missed = save.missed.filter((m) => m.uid !== item.uid);
+  else if (!save.missed.some((m) => m.uid === item.uid)) save.missed.push(item);
+  persist();
+  advance();
+}
+
+function onMatchWord(word) {
+  if (!ui.match) return;
+  const card = ui.match.words.find((w) => w.word === word);
+  if (!card || card.state !== "open") return;
+  ui.match.selected = word;
+  ui.note = "";
+  ui.feedback = null;
+  render();
+}
+
+function onMatchRoot(rootId) {
+  if (!ui.match) return;
+  const rootBtn = ui.match.roots.find((r) => r.id === rootId && r.state === "open");
+  if (!rootBtn) return;
+  if (!ui.match.selected) {
+    ui.note = "Tap a word first.";
+    render();
+    return;
+  }
+  const card = ui.match.words.find((w) => w.word === ui.match.selected);
+  const ok = card.root === rootId;
+  card.state = ok ? "right" : "wrong";
+  if (ok) {
+    rootBtn.state = "right";
+    rootBtn.word = card.word;
+  } else {
+    const correctBtn = ui.match.roots.find((r) => r.id === card.root && r.state === "open");
+    if (correctBtn) {
+      correctBtn.state = "shown";
+      correctBtn.word = card.word;
+    }
+  }
+  ui.match.selected = null;
+  ui.note = "";
+  const w = wordByName(card.word);
+  const missItem = makeRootQuestion(w);
+  record(ok, missItem);
+  const picked = rootById(rootId);
+  const text = ok
+    ? rootExplain(card.word, card.root)
+    : "Not a match. You chose " + picked.name + ", meaning " + picked.meaning + ". " + rootExplain(card.word, card.root);
+  ui.feedback = { ok: ok, kicker: feedbackKicker(ok), text: text };
+  const done = ui.match.words.every((entry) => entry.state !== "open");
+  ui.answered = done;
+  render();
+}
+
+function setLesson(lesson) {
+  save.lesson = lesson;
+  decks.mc = [];
+  persist();
+  render();
+}
+
+function toggleOpen(word) {
+  ui.openWord = ui.openWord === word ? null : word;
+  render();
+}
+
+function markStudy(word, kind) {
+  save.known[word] = kind;
+  const uid = "flash:" + word;
+  const w = wordByName(word);
+  if (kind === "known") save.missed = save.missed.filter((m) => m.uid !== uid);
+  else if (!save.missed.some((m) => m.uid === uid)) {
+    save.missed.push({ uid: uid, mode: "flash", lesson: w.lesson, word: word });
+  }
+  persist();
+  render();
+}
+
+function resetProgress() {
+  if (!confirm("Clear saved progress on this device?")) return;
+  save = defaultSave();
+  sessionScore = 0;
+  decks.mc = [];
+  persist();
+  localStorage.removeItem(KEY);
+  render();
+}
+
+function headerStats() {
+  const hot = save.stats.streak >= 3 ? " hot" : "";
+  if (ui.screen !== "home") {
+    return '<p class="slim' + hot + '">Score ' + sessionScore + ' · Streak ' + save.stats.streak + ' · Known ' + knownCount() + '/' + scopedWords().length + '</p>';
+  }
+  return (
+    '<div class="stats">' +
+      '<div class="stat"><b>' + sessionScore + '</b><span>Score</span></div>' +
+      '<div class="stat' + hot + '"><b>' + save.stats.streak + '</b><span>Streak</span></div>' +
+      '<div class="stat"><b>' + knownCount() + '/' + scopedWords().length + '</b><span>Known</span></div>' +
+    '</div>'
+  );
+}
+
+function shell(body) {
+  return headerStats() + '<div class="rule"></div>' + body;
+}
+
+function nav(title, countLabel) {
+  return (
+    '<div class="nav">' +
+      '<button class="ghost" data-act="home" style="min-height:48px;padding:10px 12px">Home</button>' +
+      '<h2>' + esc(title) + '</h2>' +
+      '<span class="fine" style="margin:0">' + esc(countLabel) + '</span>' +
+    '</div>'
+  );
+}
+
+function feedbackHTML() {
+  if (!ui.feedback) return "";
+  return (
+    '<div class="feedback ' + (ui.feedback.ok ? "good" : "bad") + '" role="status">' +
+      '<p class="fk">' + esc(ui.feedback.kicker) + '</p>' +
+      '<p>' + esc(ui.feedback.text) + '</p>' +
+    '</div>'
+  );
+}
+
+function renderHome() {
+  const waiting = missedInScope().length;
+  const modes = [
+    ["study", "Study", "Definitions and roots"],
+    ["flash", "Flashcards", "Flip, then mark it"],
+    ["mc", "Multiple choice", "Meaning and opposites"],
+    ["blank", "Fill in the blank", "Type the word"],
+    ["roots", "Root match", "Word to its root"],
+    ["usage", "Usage judge", "Spot the bad sentence"]
+  ];
+  const buttons = modes.map((m, i) => (
+    '<button class="mode" data-act="start" data-mode="' + m[0] + '">' +
+      '<span class="num">' + (i + 1) + '</span>' +
+      '<span><span class="name">' + m[1] + '</span><span class="blurb">' + m[2] + '</span></span>' +
+    '</button>'
+  )).join("");
+  const practice = (
+    '<button class="mode wide" data-act="practice"' + (waiting ? "" : " disabled") + '>' +
+      '<span class="num">+</span>' +
+      '<span><span class="name">Practice missed</span><span class="blurb">' +
+        (waiting ? "Retry items you missed or marked to practice." : "Miss a question and it will wait here.") +
+      '</span></span>' +
+      (waiting ? '<span class="badge">' + waiting + '</span>' : "") +
+    '</button>'
+  );
+  return (
+    '<p class="kicker">Classical roots · Lessons 3 and 4</p>' +
+    '<h1>All or Nothing</h1>' +
+    '<p class="deck">Twenty-two words from ten Greek and Latin roots.</p>' +
+    '<div class="seg" role="group" aria-label="Lesson filter">' +
+      '<button data-act="lesson" data-lesson="3" aria-pressed="' + (save.lesson === "3") + '">Lesson 3</button>' +
+      '<button data-act="lesson" data-lesson="4" aria-pressed="' + (save.lesson === "4") + '">Lesson 4</button>' +
+      '<button data-act="lesson" data-lesson="both" aria-pressed="' + (save.lesson === "both") + '">Both</button>' +
+    '</div>' +
+    '<p class="fine">Best streak ' + save.stats.bestStreak + '. Progress stays on this device.</p>' +
+    headerStats() +
+    '<div class="rule"></div>' +
+    '<div class="modes">' + buttons + practice + '</div>' +
+    '<div class="foot"><button class="linkish" data-act="reset">Reset saved progress</button></div>'
+  );
+}
+
+function renderEmpty() {
+  const msg = ui.practice
+    ? "The practice queue is empty for this lesson. Miss a question, or mark a card as still learning, and it will wait here."
+    : "Nothing is waiting in this round. Try the other lesson, or choose Both.";
+  return shell(
+    nav(ui.title || "Practice", "") +
+    '<div class="card"><p class="prompt">' + esc(msg) + '</p></div>' +
+    '<div class="actions"><button class="primary" data-act="home">Back home</button></div>'
+  );
+}
+
+function renderFlash(item) {
+  const w = wordByName(item.word);
+  const r = rootById(w.root);
+  const defs = w.defs.map((d) => '<p class="def">' + esc(d) + '</p>').join("");
+  const examples = w.examples.map((ex) => '<p class="example">' + esc(ex) + '</p>').join("");
+  const forms = w.forms.length ? '<p class="note">Also: ' + esc(w.forms.join(", ")) + '</p>' : "";
+  const note = w.note ? '<p class="note">' + esc(w.note) + '</p>' : "";
+  const mark = save.known[w.word] === "known" ? "Known" : (save.known[w.word] === "practice" ? "Needs practice" : "New");
+  return shell(
+    nav("Flashcards", (ui.index + 1) + " / " + ui.queue.length) +
+    '<div class="progress"><span style="width:' + Math.round((ui.index / ui.queue.length) * 100) + '%"></span></div>' +
+    '<div class="flip' + (ui.flipped ? " is-flipped" : "") + '">' +
+      '<div class="flip-inner">' +
+        '<div class="face front card" data-act="flip" tabindex="0" role="button" aria-label="Flip card">' +
+          '<p class="tag">Lesson ' + w.lesson + (w.challenge ? " · Challenge" : "") + '</p>' +
+          '<p class="word">' + esc(w.word) + '</p>' +
+          '<p class="pos">' + esc(w.pos) + '</p>' +
+          '<p class="hint">' + mark + '</p>' +
+          '<p class="tapnote">Tap the card for the definition, root, and example.</p>' +
+        '</div>' +
+        '<div class="face back card">' +
+          '<p class="tag">' + esc(w.word) + '</p>' +
+          defs +
+          '<p class="rootchip">' + esc(r.name) + ' · ' + esc(r.lang) + ' · ' + esc(r.meaning) + '</p>' +
+          '<p class="note">' + esc(r.parts) + '</p>' +
+          examples + forms + note +
+          '<div class="row" style="margin-top:14px">' +
+            '<button class="ghost" data-act="learn" data-stop="1">Still learning</button>' +
+            '<button class="primary" data-act="know" data-stop="1">I know this</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+}
+
+function renderMc(item) {
+  const choices = item.choices.map((choice, i) => {
+    let cls = "choice";
+    if (ui.answered && choice.answer) cls += " is-right";
+    else if (ui.answered && ui.picked === i) cls += " is-wrong";
+    return '<button class="' + cls + '" data-act="choose" data-i="' + i + '"' + (ui.answered ? " disabled" : "") + '>' +
+      '<span class="letter">' + LETTERS[i] + '</span> ' + esc(choice.text) + '</button>';
+  }).join("");
+  const head = item.word ? '<p class="word">' + esc(item.word) + '</p>' : "";
+  const prompt =
+    '<p class="prompt">' + esc(item.heading) + '</p>' +
+    (item.prompt ? '<p class="prompt">"' + esc(item.prompt) + '"</p>' : "");
+  return shell(
+    nav(ui.practice ? "Practice" : "Multiple choice", (ui.index + 1) + " / " + ui.queue.length) +
+    '<div class="card">' +
+      '<p class="tag">' + esc(item.kind) + ' · Lesson ' + item.lesson + '</p>' +
+      head + prompt +
+      '<div class="choices">' + choices + '</div>' +
+      feedbackHTML() +
+    '</div>' +
+    (ui.answered ? '<div class="actions"><button class="primary" data-act="next">Next</button></div>' : '<p class="hint">Choose the best answer. Keys 1 to 4 work too.</p>')
+  );
+}
+
+function renderBlank(item) {
+  const shown = ui.answered
+    ? rich(item.sentence).replace("_____", '<span class="gap">' + esc(item.show) + '</span>')
+    : rich(item.sentence).replace("_____", '<span class="gap">&nbsp;</span>');
+  return shell(
+    nav(ui.practice ? "Practice" : "Fill in the blank", (ui.index + 1) + " / " + ui.queue.length) +
+    '<div class="card">' +
+      '<p class="tag">Lesson ' + item.lesson + '</p>' +
+      '<p class="prompt">' + shown + '</p>' +
+      (ui.answered ? "" :
+        '<input class="blankbox" id="blank" data-act="blankinput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type the word" value="' + esc(ui.blank) + '">') +
+      feedbackHTML() +
+    '</div>' +
+    '<div class="actions">' +
+      (ui.answered
+        ? '<button class="primary" data-act="next">Next</button>'
+        : '<button class="primary" id="check" data-act="check"' + (ui.blank.trim() ? "" : " disabled") + '>Check</button>') +
+    '</div>'
+  );
+}
+
+function renderUsage(item) {
+  const options = item.options.map((opt, i) => {
+    let cls = "choice";
+    if (ui.answered && opt.bad) cls += " is-right";
+    else if (ui.answered && ui.picked === i && !opt.bad) cls += " is-wrong";
+    return '<button class="' + cls + '" data-act="usage" data-i="' + i + '"' + (ui.answered ? " disabled" : "") + '>' +
+      '<span class="letter">' + LETTERS[i] + '</span> ' + esc(opt.text) + '</button>';
+  }).join("");
+  return shell(
+    nav(ui.practice ? "Practice" : "Usage judge", (ui.index + 1) + " / " + ui.queue.length) +
+    '<div class="card">' +
+      '<p class="tag">Lesson ' + item.lesson + '</p>' +
+      '<p class="word">' + esc(item.word) + '</p>' +
+      '<p class="prompt">Which sentence uses the word incorrectly?</p>' +
+      '<div class="choices">' + options + '</div>' +
+      feedbackHTML() +
+    '</div>' +
+    (ui.answered ? '<div class="actions"><button class="primary" data-act="next">Next</button></div>' : "")
+  );
+}
+
+function renderRoots() {
+  const m = ui.match;
+  const words = m.words.map((card) => {
+    const cls = "chip" + (m.selected === card.word ? " on" : "") + (card.state === "right" ? " right" : "") + (card.state === "wrong" ? " wrong" : "");
+    const sub = card.state === "open" ? "Tap, then choose a root" : rootLabel(card.root);
+    return '<button class="' + cls + '" data-act="mword" data-word="' + esc(card.word) + '"' + (card.state === "open" ? "" : " disabled") + '>' +
+      esc(card.word) + '<small>' + esc(sub) + '</small></button>';
+  }).join("");
+  const roots = m.roots.map((root) => {
+    const r = rootById(root.id);
+    let cls = "chip";
+    if (root.state === "right" || root.state === "shown") cls += " right";
+    if (root.state === "wrong") cls += " wrong";
+    const extra = root.word ? "<small>Matches " + esc(root.word) + "</small>" : "<small>" + esc(r.lang) + "</small>";
+    return '<button class="' + cls + '" data-act="mroot" data-root="' + esc(root.id) + '"' + (root.state === "open" ? "" : " disabled") + '>' +
+      esc(r.name) + " · " + esc(r.meaning) + extra + '</button>';
+  }).join("");
+  const done = m.words.every((card) => card.state !== "open");
+  return shell(
+    nav(ui.practice ? "Practice" : "Root match", "Set " + (ui.index + 1) + " / " + ui.queue.length) +
+    '<div class="card">' +
+      '<p class="tag">Match a word to its root</p>' +
+      '<p class="prompt">Tap a word, then tap the root it comes from.</p>' +
+      (ui.note ? '<p class="hint">' + esc(ui.note) + '</p>' : "") +
+      '<p class="match-label">Words</p>' + words +
+      '<p class="match-label">Roots</p>' + roots +
+      feedbackHTML() +
+    '</div>' +
+    (done ? '<div class="actions"><button class="primary" data-act="next">' + (ui.index + 1 >= ui.queue.length ? "See results" : "Next set") + '</button></div>' : "")
+  );
+}
+
+function renderPlay() {
+  const item = currentItem();
+  if (!item) return renderResults();
+  if (item.mode === "flash") return renderFlash(item);
+  if (item.mode === "mc") return renderMc(item);
+  if (item.mode === "blank") return renderBlank(item);
+  if (item.mode === "usage") return renderUsage(item);
+  if (item.mode === "roots") return renderRoots();
+  return renderEmpty();
+}
+
+function renderResults() {
+  const moreMc = ui.mode === "mc" && !ui.practice && decks.mc.length > 0;
+  const againLabel = ui.practice ? "Practice again" : "Play again";
+  const againAct = ui.practice ? "practice" : "start";
+  const againMode = ui.practice ? "" : ui.mode;
+  return shell(
+    nav("Round complete", "") +
+    '<div class="card">' +
+      '<p class="tag">This round</p>' +
+      '<p class="end-score">' + ui.roundCorrect + '<span style="font-size:1.3rem;color:var(--muted)"> / ' + ui.roundTotal + '</span></p>' +
+      '<p class="prompt">Streak now ' + save.stats.streak + '. Best streak ' + save.stats.bestStreak + '.</p>' +
+      '<p class="note">Missed items are saved in the practice queue.</p>' +
+    '</div>' +
+    '<div class="actions">' +
+      (moreMc ? '<button class="primary" data-act="start" data-mode="mc">Keep going</button>' : "") +
+      '<button class="' + (moreMc ? "ghost" : "primary") + '" data-act="' + againAct + '" data-mode="' + esc(againMode) + '" data-fresh="1">' + againLabel + '</button>' +
+      (!ui.practice && missedInScope().length ? '<button class="ghost" data-act="practice">Practice missed (' + missedInScope().length + ')</button>' : "") +
+      '<button class="ghost" data-act="home">Home</button>' +
+    '</div>'
+  );
+}
+
+function renderStudy() {
+  const q = ui.query.trim().toLowerCase();
+  const lessons = save.lesson === "both" ? [3, 4] : [Number(save.lesson)];
+  let blocks = "";
+  lessons.forEach((lesson) => {
+    const roots = ROOTS.filter((r) => r.lesson === lesson);
+    let inner = "";
+    roots.forEach((r) => {
+      const words = WORDS.filter((w) => w.root === r.id).filter((w) => {
+        if (!q) return true;
+        const blob = (w.word + " " + w.defs.join(" ") + " " + r.name + " " + r.meaning).toLowerCase();
+        return blob.includes(q);
+      });
+      if (q && !words.length) return;
+      const familiar = r.familiar.length ? "Familiar: " + r.familiar.join(", ") + ". " : "";
+      const challenge = r.challenge.length ? "Also from this root: " + r.challenge.join(", ") + "." : "";
+      const cards = words.map((w) => {
+        const open = ui.openWord === w.word;
+        const mark = save.known[w.word] === "known" ? "Known" : (save.known[w.word] === "practice" ? "Practice" : "");
+        const detail = open ? (
+          '<div class="detail">' +
+            w.defs.map((d) => '<p>' + esc(d) + '</p>').join("") +
+            '<p><span class="pill">' + esc(r.name) + '</span> ' + esc(r.lang) + ' for ' + esc(r.meaning) + '</p>' +
+            w.examples.map((ex) => '<p>' + esc(ex) + '</p>').join("") +
+            (w.forms.length ? '<p>Forms: ' + esc(w.forms.join(", ")) + '</p>' : "") +
+            (w.note ? '<p>' + esc(w.note) + '</p>' : "") +
+            '<div class="row">' +
+              '<button class="ghost" data-act="study-practice" data-word="' + esc(w.word) + '">Needs practice</button>' +
+              '<button class="primary" data-act="study-known" data-word="' + esc(w.word) + '">Mark known</button>' +
+            '</div>' +
+          '</div>'
+        ) : "";
+        return '<button class="wordbtn" data-act="open" data-word="' + esc(w.word) + '">' +
+          '<span class="w">' + esc(w.word) + '</span><span class="s">' + esc(w.pos) + (w.challenge ? " · Challenge" : "") + (mark ? " · " + mark : "") + '</span>' +
+          '</button>' + detail;
+      }).join("");
+      inner += '<article class="root-block"><div class="root-head"><h3>' + esc(r.parts) + '</h3>' +
+        '<p>' + esc(r.lang) + ' for "' + esc(r.meaning) + '."</p>' +
+        (r.note ? '<p>' + esc(r.note) + '</p>' : "") +
+        '<p>' + esc((familiar + challenge).trim()) + '</p></div>' + cards + '</article>';
+    });
+    if (inner) blocks += '<h2 class="lesson-head">Lesson ' + lesson + '</h2>' + inner;
+  });
+  if (!blocks) blocks = '<div class="card"><p class="prompt">No words match that search.</p></div>';
+  return shell(
+    nav("Study", scopedWords().length + " words") +
+    '<input class="search" id="search" placeholder="Search words or meanings" value="' + esc(ui.query) + '">' +
+    blocks
+  );
+}
+
+let lastNav = "";
+
+function render() {
+  const app = document.getElementById("app");
+  let html = "";
+  if (ui.screen === "home") html = renderHome();
+  else if (ui.screen === "study") html = renderStudy();
+  else if (ui.screen === "empty") html = renderEmpty();
+  else if (ui.screen === "results") html = renderResults();
+  else html = renderPlay();
+  app.innerHTML = html;
+  const navKey = ui.screen + "|" + ui.mode + "|" + ui.index;
+  if (navKey !== lastNav) {
+    window.scrollTo(0, 0);
+    lastNav = navKey;
+  }
+  const blank = document.getElementById("blank");
+  if (blank) blank.focus();
+  const search = document.getElementById("search");
+  if (search && ui.screen === "study" && document.activeElement !== search) {
+    /* keep typed value; do not steal focus after every toggle */
+  }
+}
+
+document.body.addEventListener("click", (event) => {
+  const btn = event.target.closest("[data-act]");
+  if (!btn) return;
+  if (btn.dataset.stop) event.stopPropagation();
+  const act = btn.dataset.act;
+  if (act === "lesson") setLesson(btn.dataset.lesson);
+  else if (act === "start") {
+    if (btn.dataset.fresh === "1") decks.mc = [];
+    startMode(btn.dataset.mode, false);
+  }
+  else if (act === "practice") startMode("practice", true);
+  else if (act === "home") goHome();
+  else if (act === "reset") resetProgress();
+  else if (act === "flip") {
+    if (event.target.closest("[data-stop]")) return;
+    ui.flipped = !ui.flipped;
+    render();
+  }
+  else if (act === "know") onKnow("known");
+  else if (act === "learn") onKnow("practice");
+  else if (act === "choose") onChoose(Number(btn.dataset.i));
+  else if (act === "usage") onUsage(Number(btn.dataset.i));
+  else if (act === "check") onBlank();
+  else if (act === "next") advance();
+  else if (act === "mword") onMatchWord(btn.dataset.word);
+  else if (act === "mroot") onMatchRoot(btn.dataset.root);
+  else if (act === "open") toggleOpen(btn.dataset.word);
+  else if (act === "study-known") markStudy(btn.dataset.word, "known");
+  else if (act === "study-practice") markStudy(btn.dataset.word, "practice");
+});
+
+document.body.addEventListener("input", (event) => {
+  if (event.target.id === "blank") {
+    ui.blank = event.target.value;
+    const check = document.getElementById("check");
+    if (check) check.disabled = !ui.blank.trim();
+  } else if (event.target.id === "search") {
+    ui.query = event.target.value;
+    const pos = event.target.selectionStart;
+    render();
+    const again = document.getElementById("search");
+    if (again) {
+      again.focus();
+      again.setSelectionRange(pos, pos);
+    }
+  }
+});
+
+document.body.addEventListener("keydown", (event) => {
+  if (event.target && event.target.id === "blank" && event.key === "Enter") {
+    event.preventDefault();
+    onBlank();
+    return;
+  }
+  if (event.target && (event.target.id === "search" || event.target.id === "blank")) return;
+  if (ui.screen === "play" && !ui.answered && /^[1-4]$/.test(event.key)) {
+    const item = currentItem();
+    if (!item) return;
+    const index = Number(event.key) - 1;
+    if (item.mode === "mc" && item.choices[index]) onChoose(index);
+    if (item.mode === "usage" && item.options[index]) onUsage(index);
+  }
+  if (event.key === "Enter" && event.target && event.target.dataset && event.target.dataset.act === "flip") {
+    ui.flipped = !ui.flipped;
+    render();
+  }
+});
+
+window.addEventListener("popstate", () => {
+  pushed = false;
+  showHome();
+});
+
+try { history.replaceState({ mode: false }, ""); } catch (err) { /* opened as a file */ }
+window.__quiz = {
+  gradeBlank: gradeBlank,
+  words: WORDS,
+  roots: ROOTS,
+  blanks: BLANKS,
+  synonyms: SYNONYMS,
+  antonyms: ANTONYMS,
+  usage: USAGE,
+  ui: ui
+};
+render();
+</script>
+</body>
+</html>
