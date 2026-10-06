@@ -3,34 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#100e0c">
+<meta name="theme-color" content="#120c1e">
 <meta name="color-scheme" content="dark">
 <title>All or Nothing</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314100e'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18' fill='%23e4b85c' font-family='Georgia,serif'%3EA%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23120c1e'/%3E%3Cpath d='M8 22 L16 8 L24 22 Z' fill='%23f0c14a'/%3E%3C/svg%3E">
 <style>
   :root {
-    --bg0: #100e0c;
-    --bg1: #1a1612;
-    --bg2: #241e18;
-    --bg3: #2c251e;
-    --ink: #f6efe2;
-    --muted: #cbbba4;
-    --faint: #9c8d78;
-    --gold: #e4b85c;
-    --gold-ink: #24180a;
-    --line: rgba(228, 184, 92, 0.28);
-    --line-strong: rgba(228, 184, 92, 0.62);
-    --good: #c5e2ae;
-    --good-bg: #1c2918;
-    --good-line: rgba(197, 226, 174, 0.7);
-    --bad: #f0b0a2;
-    --bad-bg: #321c18;
-    --bad-line: rgba(240, 176, 162, 0.75);
-    --serif: "Liberation Serif", "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
-    --sans: Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    --bg: #120c1e;
+    --bg2: #241433;
+    --ink: #f7f1e4;
+    --muted: #d9c7ae;
+    --gold: #f0c14a;
+    --gold-ink: #2a1c08;
+    --accent: #e23d3d;
+    --card: #2c1a40;
+    --line: rgba(240, 193, 74, 0.45);
+    --good: #b6f0a0;
+    --bad: #ffb4a8;
+    --sand: #f3e2bf;
+    --sand-ink: #2a1c10;
+    --serif: "Liberation Serif", Georgia, "Times New Roman", serif;
+    --sans: Inter, "Segoe UI", system-ui, sans-serif;
   }
-
+  html[data-theme="crimson"] {
+    --bg: #2a0d12; --bg2: #4a1520; --card: #3a1218; --accent: #ff5a3c; --gold: #ffd15c;
+  }
+  html[data-theme="aegean"] {
+    --bg: #071a2b; --bg2: #0e3348; --card: #12384a; --accent: #3ec6e0; --gold: #f2d48a;
+  }
+  html[data-theme="purple"] {
+    --bg: #1a0d28; --bg2: #321454; --card: #3a1860; --accent: #c084fc; --gold: #f5d76e;
+  }
+  html[data-theme="sun"] {
+    --bg: #2a1a08; --bg2: #4a3010; --card: #3d2810; --accent: #ffb703; --gold: #ffe08a;
+  }
   * { box-sizing: border-box; }
   html { font-size: 18px; }
   body {
@@ -39,473 +45,415 @@
     color: var(--ink);
     font-family: var(--sans);
     background:
-      radial-gradient(1100px 640px at 50% -12%, #3a2d1e 0%, transparent 58%),
-      radial-gradient(700px 480px at 110% 110%, #2a1c14 0%, transparent 46%),
-      var(--bg0);
+      radial-gradient(900px 420px at 50% -10%, rgba(226, 61, 61, 0.35), transparent 55%),
+      radial-gradient(700px 380px at 50% 120%, rgba(240, 193, 74, 0.16), transparent 50%),
+      var(--bg);
   }
   button, input { font: inherit; color: inherit; }
-  button { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-  button:disabled { cursor: default; opacity: 0.55; }
-  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
-  ::selection { background: var(--gold); color: var(--gold-ink); }
-
+  button { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+  button:disabled { cursor: default; }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
   .wrap {
-    width: min(580px, 100%);
+    width: min(480px, 100%);
     margin: 0 auto;
-    padding: 18px 16px calc(28px + env(safe-area-inset-bottom));
+    padding: 14px 14px calc(22px + env(safe-area-inset-bottom));
   }
-  .slim {
-    margin: 0 0 8px;
-    color: var(--muted);
-    font-size: 0.85rem;
+  .hud {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    align-items: center;
+    background: rgba(10, 6, 18, 0.55);
+    border: 2px solid var(--line);
+    border-radius: 18px;
+    padding: 8px 10px;
   }
-  .slim.hot { color: var(--gold); font-weight: 700; }
-
-  .kicker {
-    margin: 0 0 6px;
+  .ava { display: block; filter: drop-shadow(0 4px 0 rgba(0,0,0,.35)); }
+  .rank {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .xplabel { color: var(--muted); font-size: 0.72rem; margin-top: 3px; }
+  .xp, .hp, .timer {
+    height: 10px;
+    border-radius: 99px;
+    background: #140c18;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+  .xp { margin-top: 6px; }
+  .xp > span { display: block; height: 100%; background: linear-gradient(90deg, #c9842a, var(--gold)); }
+  .coins {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 800;
     color: var(--gold);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    font-weight: 650;
+    font-variant-numeric: tabular-nums;
   }
+  .hero { text-align: center; padding: 12px 0 6px; }
   h1 {
     margin: 0;
     font-family: var(--serif);
-    font-size: clamp(2.3rem, 9vw, 3.15rem);
-    font-weight: 700;
+    font-size: clamp(2.15rem, 10vw, 2.8rem);
+    line-height: 0.92;
     letter-spacing: -0.03em;
-    line-height: 0.95;
+    text-shadow: 0 3px 0 #3a140c, 0 0 24px rgba(240, 193, 74, 0.35);
   }
-  .deck {
-    margin: 12px 0 0;
-    color: var(--muted);
-    font-family: var(--serif);
-    font-size: 1.05rem;
-    line-height: 1.45;
-  }
-  .rule {
-    height: 1px;
-    margin: 18px 0;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    opacity: 0.7;
-  }
-
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  .stat {
-    background: rgba(20, 16, 12, 0.55);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 10px 8px 9px;
-    text-align: center;
-  }
-  .stat b {
-    display: block;
-    font-family: var(--serif);
-    font-size: 1.35rem;
-    font-weight: 700;
+  .tagline {
+    margin: 6px 0 0;
     color: var(--gold);
-    line-height: 1.1;
-  }
-  .stat span {
-    display: block;
-    margin-top: 2px;
-    color: var(--faint);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
+    font-size: 0.72rem;
+    font-weight: 800;
   }
-  .stat.hot b { color: #f3d48a; }
-
-  .seg {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    padding: 4px;
-    background: #14110e;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    margin: 14px 0 8px;
-  }
-  .seg button {
-    min-height: 48px;
-    border: 0;
-    border-radius: 11px;
-    background: transparent;
+  .how {
+    margin: 8px 0 0;
     color: var(--muted);
+    font-size: 0.86rem;
+    line-height: 1.35;
   }
-  .seg button[aria-pressed="true"] {
-    background: var(--gold);
-    color: var(--gold-ink);
-    font-weight: 700;
-  }
-
-  .fine {
-    margin: 8px 0 16px;
-    color: var(--faint);
-    font-size: 0.82rem;
-  }
-
-  .modes {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .mode {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
+  .bolt {
     width: 100%;
-    text-align: left;
-    min-height: 72px;
-    padding: 10px 10px;
+    margin: 12px 0;
+    min-height: 64px;
+    border: 0;
     border-radius: 16px;
-    border: 1px solid var(--line);
-    background: linear-gradient(180deg, #2b241c, #201b16);
-    box-shadow: var(--shadow);
-  }
-  .mode.wide {
-    grid-column: 1 / -1;
-    min-height: 60px;
-  }
-  .mode:active { transform: translateY(1px); }
-  .mode .num {
-    flex: 0 0 auto;
-    width: 1.3rem;
-    font-family: var(--serif);
-    font-size: 1.2rem;
-    color: var(--gold);
-  }
-  .mode .name { display: block; font-weight: 700; font-size: 0.95rem; line-height: 1.15; }
-  .mode .blurb { display: block; color: var(--muted); font-size: 0.75rem; margin-top: 2px; line-height: 1.25; }
-  .mode .badge {
-    margin-left: auto;
-    background: var(--gold);
-    color: var(--gold-ink);
-    border-radius: 999px;
-    min-width: 1.8rem;
-    height: 1.8rem;
-    display: grid;
-    place-items: center;
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 0 8px;
-  }
-
-  .nav {
+    background: linear-gradient(180deg, #ffd15c, #e23d3d);
+    color: #2a120c;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    box-shadow: 0 6px 0 #7a1d16;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    justify-content: space-between;
+    padding: 10px 14px;
   }
-  .nav h2 {
-    margin: 0;
-    flex: 1;
+  .bolt:active { transform: translateY(2px); box-shadow: 0 3px 0 #7a1d16; }
+  .bolt small { display: block; font-weight: 700; letter-spacing: 0; opacity: 0.8; }
+  .world { margin: 8px 0 16px; }
+  .world h2 {
+    margin: 0 0 4px;
     font-family: var(--serif);
     font-size: 1.35rem;
-    font-weight: 700;
   }
-  .ghost, .primary, .goodbtn, .badbtn, .choice, .chip, .linkish {
-    border-radius: 14px;
-    min-height: 52px;
-    padding: 12px 14px;
-  }
-  .ghost {
-    background: transparent;
-    border: 1px solid var(--line);
+  .world .sub { margin: 0 0 8px; color: var(--muted); font-size: 0.82rem; }
+  .world-all h2 { color: #ffb4a8; }
+  .world-none h2 { color: #9ad7ff; }
+  .world-final h2 { color: var(--gold); }
+  .path { display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .node {
+    width: 100%;
+    min-height: 64px;
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 18px;
+    border: 2px solid var(--line);
+    background: linear-gradient(180deg, #3a2460, #241433);
+    box-shadow: 0 4px 0 #120814;
     color: var(--ink);
   }
-  .primary {
-    background: var(--gold);
-    color: var(--gold-ink);
-    border: 0;
-    font-weight: 700;
+  .node:active:not(:disabled) { transform: translateY(2px); }
+  .node.boss {
+    min-height: 76px;
+    border-color: var(--accent);
+    background: linear-gradient(180deg, #6d1b2c, #2a0c14);
+  }
+  .node.hot {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(240, 193, 74, 0.35), 0 4px 0 #120814;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .node:disabled { opacity: 0.55; filter: grayscale(0.35); }
+  .medal {
+    width: 46px; height: 46px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 40% 35%, #ffe7a3, #c9842a 55%, #6a3a10);
+    color: #2a1c08;
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: 1.2rem;
+    border: 2px solid #fff3cc;
+  }
+  .node.boss .medal { background: radial-gradient(circle at 40% 35%, #ffd0c8, #e23d3d 60%, #5a1018); color: white; }
+  .node b { display: block; font-size: 1rem; }
+  .node em { display: block; font-style: normal; color: var(--muted); font-size: 0.75rem; }
+  .stars { display: flex; gap: 2px; }
+  .star { opacity: 0.28; width: 16px; height: 16px; }
+  .star svg { width: 100%; height: 100%; display: block; }
+  .star.on { opacity: 1; }
+  .heart svg { width: 100%; height: 100%; display: block; }
+  .bounty, .rowbtn, .primary, .ghost, .choice, .shopitem {
+    border-radius: 16px;
+    min-height: 56px;
+  }
+  .bounty {
     width: 100%;
+    text-align: left;
+    padding: 12px 14px;
+    border: 2px dashed var(--gold);
+    background: rgba(240, 193, 74, 0.08);
+    margin: 6px 0 10px;
   }
-  .primary:active, .ghost:active, .choice:active { transform: translateY(1px); }
-  .row { display: flex; gap: 8px; }
-  .row > * { flex: 1; }
-  .linkish {
+  .bounty:disabled { opacity: 0.6; }
+  .bounty b { display: block; }
+  .bounty span { color: var(--muted); font-size: 0.82rem; }
+  .footer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .ghost {
     background: transparent;
+    border: 2px solid var(--line);
+    color: var(--ink);
+    font-weight: 700;
+    padding: 10px;
+  }
+  .primary {
+    width: 100%;
     border: 0;
-    color: var(--faint);
-    min-height: 44px;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    background: linear-gradient(180deg, #ffe08a, var(--gold));
+    color: var(--gold-ink);
+    font-weight: 900;
+    box-shadow: 0 4px 0 #8a6418;
+    padding: 12px 14px;
   }
-
-  .progress {
-    height: 6px;
-    background: #2a241c;
-    border-radius: 99px;
-    overflow: hidden;
-    margin: 4px 0 14px;
-  }
-  .progress span {
-    display: block;
-    height: 100%;
-    background: linear-gradient(90deg, #a67c3d, var(--gold));
-  }
-  .meta {
+  .primary:active, .ghost:active, .choice:active { transform: translateY(2px); }
+  .primary:disabled { opacity: 0.45; box-shadow: none; }
+  .playtop {
     display: flex;
+    align-items: center;
     justify-content: space-between;
     gap: 8px;
-    color: var(--faint);
-    font-size: 0.8rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
     margin-bottom: 8px;
   }
-
-  .card {
-    background: linear-gradient(180deg, #2a231c, #1d1914);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 18px 16px 16px;
-    box-shadow: var(--shadow);
+  .combo { display: flex; align-items: center; gap: 6px; font-weight: 900; }
+  .combo .mult { font-family: var(--serif); font-size: 1.35rem; min-width: 2.2rem; }
+  .combo .mult.hot { color: #ffcf70; text-shadow: 0 0 12px #e23d3d; animation: pop .35s ease; }
+  .flames { display: flex; gap: 3px; align-items: flex-end; height: 26px; }
+  .flames i {
+    width: 12px; height: 16px; display: block;
+    border-radius: 50% 50% 45% 45%;
+    background: #3a3048;
   }
-  .card .tag {
-    color: var(--gold);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-size: 0.72rem;
-    margin: 0 0 8px;
+  .flames i.on {
+    height: 22px;
+    background: radial-gradient(circle at 50% 75%, #fff6d0, #ffb703 42%, #e23d3d 74%);
+    box-shadow: 0 0 10px #ffb703;
+    animation: flicker .28s infinite;
   }
-  .word {
+  .timenum {
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    font-size: 1.25rem;
+    min-width: 2ch;
+    text-align: right;
+  }
+  .timenum.low { color: #ff8d7a; }
+  .timer { margin: 4px 0 8px; height: 12px; }
+  .timer > span { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--accent), var(--gold)); }
+  .timer.low > span { background: #ff5a3c; }
+  .hearts { display: flex; gap: 4px; }
+  .heart { width: 22px; height: 20px; opacity: 0.25; }
+  .heart.full { opacity: 1; filter: drop-shadow(0 0 4px #e23d3d); }
+  .boss-wrap {
+    position: relative;
+    width: 116px;
+    height: 116px;
+    margin: 0 auto 6px;
+  }
+  .boss-wrap svg { width: 116px; height: 116px; display: block; }
+  .slash {
+    position: absolute; left: 8%; right: 8%; top: 48%; height: 7px;
+    background: linear-gradient(90deg, transparent, #fff, var(--gold), transparent);
+    opacity: 0; border-radius: 4px;
+  }
+  .boss-wrap.hit svg { animation: smack .45s ease; }
+  .boss-wrap.hit .slash { animation: slash .45s ease-out; }
+  .boss-wrap.hurt svg { animation: hurt .4s ease; }
+  .hp { margin: 4px 0 8px; height: 16px; border-color: #5a1820; }
+  .hp > span { display: block; height: 100%; background: linear-gradient(90deg, #7a1020, #ff5a3c); transition: width .35s ease; }
+  .bossname { margin: 0 0 2px; text-align: center; font-family: var(--serif); font-size: 1.45rem; color: #ffe1a8; line-height: 1.1; }
+  .hplabel { display: flex; justify-content: flex-end; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: #ffb4a8; font-weight: 800; }
+  .scroll {
+    background: linear-gradient(180deg, #f8e7c4, #e7d3a1);
+    color: var(--sand-ink);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: inset 0 0 0 2px rgba(90, 60, 20, 0.18);
+  }
+  .kicker { margin: 0; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.68rem; font-weight: 800; color: #8a5a20; }
+  .scroll h3, .wordbig {
+    margin: 2px 0;
     font-family: var(--serif);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.02;
-    font-size: clamp(1.85rem, 7vw, 2.5rem);
-    margin: 4px 0 6px;
+    font-size: clamp(1.55rem, 7vw, 2.15rem);
+    line-height: 1.05;
   }
-  .face .word { font-size: clamp(2.2rem, 8vw, 3.15rem); }
-  .pos { color: var(--muted); margin: 0 0 8px; font-family: var(--serif); }
-  .prompt {
-    font-family: var(--serif);
-    font-size: 1.18rem;
-    line-height: 1.45;
-    margin: 8px 0 0;
-  }
-  .hint { color: var(--faint); font-size: 0.86rem; margin: 10px 0 0; }
-
-  .flip { perspective: 1200px; }
-  .flip-inner {
-    display: grid;
-    transform-style: preserve-3d;
-    transition: transform 0.45s ease;
-    min-height: 340px;
-  }
-  .flip.is-flipped .flip-inner { transform: rotateY(180deg); }
-  .face {
-    grid-area: 1 / 1;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    border-radius: 20px;
-  }
-  .face.back { transform: rotateY(180deg); }
-  .flip:not(.is-flipped) .face.back { pointer-events: none; }
-  .flip.is-flipped .face.front { pointer-events: none; }
-  .tapnote { color: var(--faint); margin-top: 18px; font-size: 0.9rem; }
-
-  .def {
-    font-family: var(--serif);
-    font-size: 1.2rem;
-    line-height: 1.4;
-    margin: 0 0 8px;
-  }
-  .rootchip {
-    display: inline-block;
-    margin: 8px 0;
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid var(--line-strong);
-    color: var(--gold);
-    font-size: 0.86rem;
-  }
-  .example {
-    margin: 10px 0 0;
-    padding-left: 12px;
-    border-left: 2px solid var(--gold);
-    color: var(--muted);
-    font-family: var(--serif);
-    line-height: 1.45;
-  }
-  .note { color: var(--muted); font-size: 0.92rem; line-height: 1.4; }
-
-  .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+  .scroll p { margin: 6px 0 0; font-family: var(--serif); font-size: 1.12rem; line-height: 1.35; }
+  .choices { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
   .choice {
     width: 100%;
     text-align: left;
-    background: #16130f;
-    border: 1px solid var(--line);
-    line-height: 1.35;
-  }
-  .choice.is-right { background: var(--good-bg); border-color: var(--good-line); color: var(--good); }
-  .choice.is-wrong { background: var(--bad-bg); border-color: var(--bad-line); color: var(--bad); }
-  .choice:disabled { opacity: 1; }
-  .choice .letter {
-    display: inline-block;
-    width: 1.4rem;
-    color: var(--gold);
-    font-family: var(--serif);
-  }
-
-  .feedback {
-    margin-top: 12px;
-    border-radius: 16px;
-    padding: 14px;
-    line-height: 1.45;
-  }
-  .feedback p { margin: 0; }
-  .feedback .fk {
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    font-weight: 700;
-  }
-  .feedback.good { background: var(--good-bg); border: 1px solid var(--good-line); }
-  .feedback.good .fk { color: var(--good); }
-  .feedback.bad { background: var(--bad-bg); border: 1px solid var(--bad-line); }
-  .feedback.bad .fk { color: var(--bad); }
-  .actions {
-    position: sticky;
-    bottom: 0;
-    z-index: 2;
-    margin-top: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 14px 0 calc(6px + env(safe-area-inset-bottom));
-    background: linear-gradient(to bottom, rgba(16, 14, 12, 0), #100e0c 32%);
-  }
-
-  .blankbox {
-    width: 100%;
-    margin-top: 14px;
-    background: #120f0c;
-    border: 1px solid var(--line-strong);
-    border-radius: 14px;
-    padding: 16px;
-    font-family: var(--serif);
-    font-size: 1.15rem;
-  }
-  .gap {
-    display: inline-block;
-    min-width: 7.2rem;
-    border-bottom: 2px solid var(--gold);
-    color: var(--gold);
-    font-weight: 700;
-    padding: 0 4px;
-  }
-
-  .search {
-    width: 100%;
-    margin: 8px 0 14px;
-    background: #120f0c;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    min-height: 52px;
-    padding: 12px 14px;
-    font-size: 1rem;
-  }
-
-  .lesson-head {
-    font-family: var(--serif);
-    font-size: 1.5rem;
-    margin: 18px 0 8px;
-  }
-  .root-block { margin: 0 0 16px; }
-  .root-head h3 {
-    margin: 0;
-    font-family: var(--serif);
-    font-size: 1.15rem;
-    color: var(--gold);
-  }
-  .root-head p { margin: 2px 0; color: var(--muted); font-size: 0.88rem; line-height: 1.4; }
-  .wordbtn {
-    width: 100%;
-    text-align: left;
-    margin-top: 8px;
-    background: #1c1814;
-    border: 1px solid var(--line);
-    border-radius: 14px;
     padding: 12px 12px;
-    min-height: 58px;
-  }
-  .wordbtn .w {
-    font-family: var(--serif);
-    font-size: 1.25rem;
+    border: 2px solid rgba(240, 193, 74, 0.35);
+    background: linear-gradient(180deg, #432a62, #2a1840);
     font-weight: 700;
+    line-height: 1.3;
   }
-  .wordbtn .s { color: var(--faint); font-size: 0.8rem; margin-left: 8px; }
-  .detail {
-    padding: 4px 8px 10px;
-    color: var(--muted);
+  .choice .letter {
+    display: inline-grid; place-items: center;
+    width: 1.6rem; height: 1.6rem; margin-right: 8px;
+    border-radius: 50%; background: var(--gold); color: var(--gold-ink);
+    font-family: var(--serif); font-weight: 900;
+  }
+  .choice.is-right { background: #1d3a22; border-color: var(--good); color: var(--good); }
+  .choice.is-wrong { background: #4a1c22; border-color: #ff8d7a; color: var(--bad); }
+  .choice:disabled { opacity: 1; }
+  .feedback { margin-top: 10px; border-radius: 14px; padding: 12px; line-height: 1.4; }
+  .feedback.good { background: #16301c; border: 2px solid var(--good); }
+  .feedback.bad { background: #3a1618; border: 2px solid #ff8d7a; }
+  .feedback .fk { margin: 0 0 4px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 900; }
+  .feedback.good .fk { color: var(--good); }
+  .feedback.bad .fk { color: var(--bad); }
+  .feedback p { margin: 0; }
+  .actions { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .blankbox {
+    width: 100%; margin-top: 10px;
+    background: #140c18; color: var(--ink);
+    border: 2px solid var(--gold); border-radius: 14px;
+    min-height: 56px; padding: 12px 14px; font-size: 1.15rem; font-family: var(--serif);
+  }
+  .gap { border-bottom: 3px solid #8a5a20; color: #8a3a12; font-weight: 900; padding: 0 4px; }
+  .scorebig {
     font-family: var(--serif);
-    line-height: 1.45;
-  }
-  .detail p { margin: 6px 0; }
-  .pill {
-    display: inline-block;
-    margin-right: 6px;
-    padding: 2px 8px;
-    border-radius: 99px;
-    border: 1px solid var(--line);
-    font-family: var(--sans);
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 3.2rem;
+    margin: 0;
+    line-height: 0.9;
     color: var(--gold);
-  }
-
-  .match-label {
-    margin: 12px 0 6px;
-    color: var(--faint);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .chip {
-    width: 100%;
-    text-align: left;
-    background: #16130f;
-    border: 1px solid var(--line);
-    margin-bottom: 8px;
-  }
-  .chip small { display: block; color: var(--muted); font-size: 0.82rem; }
-  .chip.on { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
-  .chip.right { background: var(--good-bg); border-color: var(--good-line); }
-  .chip.wrong { background: var(--bad-bg); border-color: var(--bad-line); }
-  .chip:disabled { opacity: 1; }
-
-  .end-score {
-    font-family: var(--serif);
-    font-size: 3rem;
-    margin: 6px 0;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .foot {
-    margin-top: 18px;
     text-align: center;
   }
-
+  .result-stars { display: flex; justify-content: center; gap: 8px; margin: 8px 0; }
+  .result-stars .star { width: 42px; height: 42px; opacity: 0.25; }
+  .result-stars .star.on { opacity: 1; animation: pop .45s both; }
+  .result-stars .star.on:nth-child(2) { animation-delay: .12s; }
+  .result-stars .star.on:nth-child(3) { animation-delay: .24s; }
+  .banner {
+    text-align: center;
+    background: linear-gradient(180deg, #ffe08a, var(--gold));
+    color: var(--gold-ink);
+    font-weight: 900;
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .shopgrid { display: flex; flex-direction: column; gap: 8px; }
+  .shopitem {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 2px solid var(--line);
+    background: var(--card);
+  }
+  .shopitem.on { border-color: var(--good); }
+  .swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid white; }
+  .linkish { background: none; border: 0; color: var(--muted); text-decoration: underline; min-height: 44px; }
+  .search, .seg button { min-height: 48px; }
+  .search {
+    width: 100%; border-radius: 14px; border: 2px solid var(--line);
+    background: #140c18; padding: 10px 12px; margin: 8px 0;
+  }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .seg button { border-radius: 12px; border: 2px solid var(--line); background: transparent; }
+  .seg button[aria-pressed="true"] { background: var(--gold); color: var(--gold-ink); font-weight: 800; }
+  .wordbtn, .root-head { text-align: left; }
+  .wordbtn {
+    width: 100%; margin-top: 8px; min-height: 54px;
+    border-radius: 14px; border: 2px solid var(--line); background: #1a1028; padding: 10px 12px;
+  }
+  .detail { padding: 8px 4px 12px; color: var(--muted); font-family: var(--serif); line-height: 1.4; }
+  .flip { perspective: 1000px; }
+  .flip-inner { display: grid; transition: transform .45s; transform-style: preserve-3d; min-height: 280px; }
+  .flip.is-flipped .flip-inner { transform: rotateY(180deg); }
+  .face { grid-area: 1 / 1; backface-visibility: hidden; border-radius: 18px; padding: 16px; background: var(--card); border: 2px solid var(--line); }
+  .face.back { transform: rotateY(180deg); }
+  .flip:not(.is-flipped) .face.back { pointer-events: none; }
+  .flip.is-flipped .face.front { pointer-events: none; }
+  .float {
+    position: fixed; left: 50%; top: 38%;
+    transform: translateX(-50%);
+    font-family: var(--serif); font-weight: 900; font-size: 2rem;
+    color: var(--gold); text-shadow: 0 3px 0 #3a140c;
+    pointer-events: none; z-index: 20;
+    animation: floatUp .8s ease-out forwards;
+  }
+  .bit {
+    position: fixed; width: 8px; height: 8px; z-index: 19; pointer-events: none;
+    animation: burst .7s ease-out forwards;
+  }
+  #app.shake { animation: shake .4s linear; }
+  .toast {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    background: #1a1028; color: var(--ink); border: 2px solid var(--gold);
+    border-radius: 999px; padding: 8px 14px; z-index: 30; font-size: 0.85rem;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(240, 193, 74, 0.45), 0 4px 0 #120814; }
+    50% { box-shadow: 0 0 0 8px rgba(240, 193, 74, 0), 0 4px 0 #120814; }
+  }
+  @keyframes flicker {
+    50% { transform: scaleY(1.12) translateY(-1px); }
+  }
+  @keyframes pop {
+    0% { transform: scale(.6); opacity: 0; }
+    60% { transform: scale(1.12); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes floatUp {
+    to { transform: translateX(-50%) translateY(-70px); opacity: 0; }
+  }
+  @keyframes burst {
+    to { transform: translate(var(--dx), var(--dy)) rotate(160deg); opacity: 0; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px); }
+    40% { transform: translateX(7px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  @keyframes smack {
+    0% { transform: scale(1) rotate(0); }
+    35% { transform: scale(.9) rotate(-8deg); filter: brightness(1.8); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  @keyframes hurt {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); filter: brightness(1.4); }
+    75% { transform: translateX(6px); }
+  }
+  @keyframes slash {
+    0% { opacity: 0; transform: rotate(-18deg) scaleX(.2); }
+    30% { opacity: 1; transform: rotate(-18deg) scaleX(1); }
+    100% { opacity: 0; transform: rotate(-18deg) scaleX(1.05); }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .flip-inner { transition: none; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
 <script>
-const KEY = "all-or-nothing-v1";
+const KEY = "all-or-nothing-arena-v1";
+const LETTERS = ["A", "B", "C", "D"];
 
 const ROOTS = [
   { id: "PAN", lesson: 3, name: "PAN", lang: "Greek", meaning: "all", parts: "PAN", familiar: ["Pan-American", "pancreas", "panorama"], challenge: ["pandemic", "panegyric", "pantheism", "pantheon"] },
@@ -547,28 +495,17 @@ const WORDS = [
 ];
 
 const CONFUSABLES = {
-  pandemonium: ["holocaust", "panacea", "vanity"],
-  panacea: ["pandemonium", "aperture", "preclude"],
-  omnipotent: ["omnipresent", "omnivorous", "totalitarian"],
-  omnipresent: ["omnipotent", "overt", "catholic"],
-  omnivorous: ["omnipotent", "omnipresent", "vacuous"],
-  catholic: ["holocaust", "totalitarian", "cloister"],
-  holocaust: ["pandemonium", "nihilism", "panacea"],
-  totalitarian: ["omnipotent", "renegade", "recluse"],
-  cloister: ["recluse", "preclude", "vanity"],
-  preclude: ["negate", "annihilate", "cloister"],
-  recluse: ["renegade", "cloister", "nihilism"],
-  inception: ["incipient", "aperture", "overt"],
-  incipient: ["inception", "overt", "vacuous"],
-  annihilate: ["negate", "preclude", "vaunt"],
-  nihilism: ["vanity", "negate", "annihilate"],
-  negate: ["annihilate", "preclude", "vaunt"],
-  renegade: ["recluse", "nihilism", "overt"],
-  vacuous: ["vanity", "overt", "incipient"],
-  vanity: ["vaunt", "vacuous", "panacea"],
-  vaunt: ["vanity", "negate", "overt"],
-  aperture: ["overt", "cloister", "inception"],
-  overt: ["vacuous", "incipient", "aperture"]
+  pandemonium: ["holocaust", "panacea", "vanity"], panacea: ["pandemonium", "aperture", "preclude"],
+  omnipotent: ["omnipresent", "omnivorous", "totalitarian"], omnipresent: ["omnipotent", "overt", "catholic"],
+  omnivorous: ["omnipotent", "omnipresent", "vacuous"], catholic: ["holocaust", "totalitarian", "cloister"],
+  holocaust: ["pandemonium", "nihilism", "panacea"], totalitarian: ["omnipotent", "renegade", "recluse"],
+  cloister: ["recluse", "preclude", "vanity"], preclude: ["negate", "annihilate", "cloister"],
+  recluse: ["renegade", "cloister", "nihilism"], inception: ["incipient", "aperture", "overt"],
+  incipient: ["inception", "overt", "vacuous"], annihilate: ["negate", "preclude", "vaunt"],
+  nihilism: ["vanity", "negate", "annihilate"], negate: ["annihilate", "preclude", "vaunt"],
+  renegade: ["recluse", "nihilism", "overt"], vacuous: ["vanity", "overt", "incipient"],
+  vanity: ["vaunt", "vacuous", "panacea"], vaunt: ["vanity", "negate", "overt"],
+  aperture: ["overt", "cloister", "inception"], overt: ["vacuous", "incipient", "aperture"]
 };
 
 const SYNONYMS = [
@@ -632,209 +569,152 @@ const BLANKS = [
 ];
 
 const USAGE = [
-  {
-    uid: "usage:vanity", lesson: 4, word: "vanity",
-    explain: "Vanity is a noun. It can mean conceit, something worthless, or a dressing table. It is not a verb. To brag, use vaunt.",
-    wrongWhy: "He tried to vanity his trophy. Vanity cannot be used as a verb.",
-    options: [
-      { text: "Her vanity about her new haircut made her late for class.", bad: false },
-      { text: "The old story calls fame and riches a vanity that fades.", bad: false },
-      { text: "She set a small mirror on the vanity beside the bed.", bad: false },
-      { text: "He tried to vanity his trophy by telling the whole team.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:holocaust", lesson: 3, word: "holocaust",
-    explain: "Holocaust is a noun: a great destruction, especially by fire, or the historical Holocaust. It is not a verb.",
-    wrongWhy: "Holocausting is not a word. You cannot use holocaust as a verb.",
-    options: [
-      { text: "The barn fire became a holocaust that leveled the farm.", bad: false },
-      { text: "The class read survivor accounts of the Holocaust.", bad: false },
-      { text: "They spent the afternoon holocausting the old shed to clear the lot.", bad: true },
-      { text: "A holocaust of flame followed the lightning strike on the dry hill.", bad: false }
-    ]
-  },
-  {
-    uid: "usage:vacuous", lesson: 4, word: "vacuous",
-    explain: "Vacuous and vacuity mean empty of meaning or purpose, not a physical hole.",
-    wrongWhy: "A gap between fence boards is a physical space, not vacuity.",
-    options: [
-      { text: "The speech was vacuous, full of slogans and empty of ideas.", bad: false },
-      { text: "He left early because the party talk was vacuous.", bad: false },
-      { text: "Critics called the show vacuous entertainment.", bad: false },
-      { text: "Wind rushed through the vacuity between the two fence boards.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:nihilism", lesson: 4, word: "nihilism",
-    explain: "Nihilism is the total rejection of religious or moral beliefs. It is not a word for debt or ruin.",
-    wrongWhy: "A failed shop is a money problem. That is not nihilism.",
-    options: [
-      { text: "Nihilism claims that moral rules do not bind anyone.", bad: false },
-      { text: "A nihilist may reject both religious and ethical duties.", bad: false },
-      { text: "After the shop failed, they said the family faced nihilism.", bad: true },
-      { text: "Those nihilistic essays argue that traditional morals are hollow.", bad: false }
-    ]
-  },
-  {
-    uid: "usage:omnivorous", lesson: 3, word: "omnivorous",
-    explain: "Omnivorous means feeding on plants and meat, or devouring everything intellectually. It does not mean being good at two school subjects.",
-    wrongWhy: "A student who is good at math and art is not an omnivore.",
-    options: [
-      { text: "Bears are omnivorous and eat berries, fish, and insects.", bad: false },
-      { text: "An omnivorous reader finishes novels, news, and science books.", bad: false },
-      { text: "Omnivores have teeth that can handle both plants and meat.", bad: false },
-      { text: "A true omnivore is simply a student who is good at both math and art.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:catholic", lesson: 3, word: "catholic",
-    explain: "Lowercase catholic means universal, including most things. Capitalized Catholic refers to the Roman Catholic Church. It does not mean picky.",
-    wrongWhy: "Eating only carrots is narrow. Catholic tastes include most things.",
-    options: [
-      { text: "Her catholic taste in music runs from opera to folk songs.", bad: false },
-      { text: "Because his interests are so catholic, he tries every club at school.", bad: false },
-      { text: "Spain is a largely Catholic country.", bad: false },
-      { text: "She is catholic about vegetables and will eat only carrots.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:preclude", lesson: 3, word: "preclude",
-    explain: "Preclude means to prevent or make impossible.",
-    wrongWhy: "Warm sunshine does not prevent a picnic, so precluded is the wrong word.",
-    options: [
-      { text: "A locked gate precluded a shortcut through the yard.", bad: false },
-      { text: "Heavy snow precluded the soccer game.", bad: false },
-      { text: "The posted warning precludes any claim that nobody told them.", bad: false },
-      { text: "Warm sunshine precluded the picnic, so everyone stayed inside.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:overt", lesson: 4, word: "overt",
-    explain: "Overt means done or shown openly.",
-    wrongWhy: "A secret kept in a locked diary is hidden, which is the opposite of overt.",
-    options: [
-      { text: "Their overt dislike showed in every rude remark.", bad: false },
-      { text: "The plan was overt, posted on the board for all to see.", bad: false },
-      { text: "He overtly refused the offer in front of the class.", bad: false },
-      { text: "She kept her overt secret hidden in a locked diary.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:renegade", lesson: 4, word: "renegade",
-    explain: "A renegade deserts a group, cause, or faith. Faithful is an antonym.",
-    wrongWhy: "Someone who keeps every promise is faithful, not a renegade.",
-    options: [
-      { text: "The renegade left the team and played for the rival school.", bad: false },
-      { text: "Renegade soldiers refused the orders of their own officers.", bad: false },
-      { text: "They called him a renegade after he abandoned the cause.", bad: false },
-      { text: "A renegade keeps every promise to the group.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:panacea", lesson: 3, word: "panacea",
-    explain: "A panacea is a cure-all, not a remedy for one rare problem.",
-    wrongWhy: "A cure for a single rare symptom is not a panacea.",
-    options: [
-      { text: "There is no panacea that fixes every problem at school.", bad: false },
-      { text: "The ad sold the juice as a panacea for all illness.", bad: false },
-      { text: "Extra sleep helps, but it is not a panacea.", bad: false },
-      { text: "A panacea is a cure that works for only one rare symptom.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:cloister", lesson: 3, word: "cloister",
-    explain: "A cloister is a covered walk or a place of seclusion. To cloister is to seclude.",
-    wrongWhy: "Inviting the whole town in is the opposite of secluding people.",
-    options: [
-      { text: "Monks walked and prayed in the cloister beside the courtyard.", bad: false },
-      { text: "The family tried to cloister the child from every worry.", bad: false },
-      { text: "During the epidemic many students were cloistered at home.", bad: false },
-      { text: "The open market cloistered shoppers by inviting the whole town in.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:annihilate", lesson: 4, word: "annihilate",
-    explain: "Annihilate means to destroy completely.",
-    wrongWhy: "Adding one comma does not destroy a story completely.",
-    options: [
-      { text: "The late frost annihilated the tomato plants.", bad: false },
-      { text: "They feared the storm would annihilate the pier.", bad: false },
-      { text: "The invasion nearly annihilated the small fleet.", bad: false },
-      { text: "The editor annihilated the story by adding a single comma.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:vaunt", lesson: 4, word: "vaunt",
-    explain: "Vaunt means to boast, or a boast.",
-    wrongWhy: "Hiding a good grade is not bragging.",
-    options: [
-      { text: "She began to vaunt the medal the moment she left the podium.", bad: false },
-      { text: "His vaunts about the new bike embarrassed his friends.", bad: false },
-      { text: "A gracious captain does not vaunt a win in the other team's face.", bad: false },
-      { text: "Quiet students vaunt when they hide a good grade from the class.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:negate", lesson: 4, word: "negate",
-    explain: "Negate means to disprove, cancel, or repeal.",
-    wrongWhy: "Proving a result true confirms it. That does not negate it.",
-    options: [
-      { text: "The new measurement negated the old theory.", bad: false },
-      { text: "A veto can negate a bill before it becomes a law.", bad: false },
-      { text: "One calm fact can negate a wild rumor.", bad: false },
-      { text: "The chart negated the result by proving it was true.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:incipient", lesson: 4, word: "incipient",
-    explain: "Incipient means in its early stages, just beginning.",
-    wrongWhy: "The last chapter is an ending, not a beginning.",
-    options: [
-      { text: "A scratchy throat can be the sign of an incipient cold.", bad: false },
-      { text: "The incipient storm was only a dark line on the horizon.", bad: false },
-      { text: "Her incipient smile faded when the bell rang.", bad: false },
-      { text: "The incipient chapter is the last one, after the story is over.", bad: true }
-    ]
-  },
-  {
-    uid: "usage:aperture", lesson: 4, word: "aperture",
-    explain: "An aperture is an opening, especially one that admits light.",
-    wrongWhy: "A solid door with no gap is not an opening.",
-    options: [
-      { text: "She widened the aperture so the lens could gather more light.", bad: false },
-      { text: "Smoke left the tent through a small aperture at the top.", bad: false },
-      { text: "Stars showed through an aperture in the clouds.", bad: false },
-      { text: "The solid steel door was one wide aperture that blocked every draft.", bad: true }
-    ]
-  }
+  { uid: "usage:vanity", lesson: 4, word: "vanity", explain: "Vanity is a noun. It can mean conceit, something worthless, or a dressing table. It is not a verb. To brag, use vaunt.", wrongWhy: "He tried to vanity his trophy. Vanity cannot be used as a verb.", options: [
+    { text: "Her vanity about her new haircut made her late for class.", bad: false },
+    { text: "The old story calls fame and riches a vanity that fades.", bad: false },
+    { text: "She set a small mirror on the vanity beside the bed.", bad: false },
+    { text: "He tried to vanity his trophy by telling the whole team.", bad: true }
+  ]},
+  { uid: "usage:holocaust", lesson: 3, word: "holocaust", explain: "Holocaust is a noun: a great destruction, especially by fire, or the historical Holocaust. It is not a verb.", wrongWhy: "Holocausting is not a word. You cannot use holocaust as a verb.", options: [
+    { text: "The barn fire became a holocaust that leveled the farm.", bad: false },
+    { text: "The class read survivor accounts of the Holocaust.", bad: false },
+    { text: "They spent the afternoon holocausting the old shed to clear the lot.", bad: true },
+    { text: "A holocaust of flame followed the lightning strike on the dry hill.", bad: false }
+  ]},
+  { uid: "usage:vacuous", lesson: 4, word: "vacuous", explain: "Vacuous and vacuity mean empty of meaning or purpose, not a physical hole.", wrongWhy: "A gap between fence boards is a physical space, not vacuity.", options: [
+    { text: "The speech was vacuous, full of slogans and empty of ideas.", bad: false },
+    { text: "He left early because the party talk was vacuous.", bad: false },
+    { text: "Critics called the show vacuous entertainment.", bad: false },
+    { text: "Wind rushed through the vacuity between the two fence boards.", bad: true }
+  ]},
+  { uid: "usage:nihilism", lesson: 4, word: "nihilism", explain: "Nihilism is the total rejection of religious or moral beliefs. It is not a word for debt or ruin.", wrongWhy: "A failed shop is a money problem. That is not nihilism.", options: [
+    { text: "Nihilism claims that moral rules do not bind anyone.", bad: false },
+    { text: "A nihilist may reject both religious and ethical duties.", bad: false },
+    { text: "After the shop failed, they said the family faced nihilism.", bad: true },
+    { text: "Those nihilistic essays argue that traditional morals are hollow.", bad: false }
+  ]},
+  { uid: "usage:omnivorous", lesson: 3, word: "omnivorous", explain: "Omnivorous means feeding on plants and meat, or devouring everything intellectually. It does not mean being good at two school subjects.", wrongWhy: "A student who is good at math and art is not an omnivore.", options: [
+    { text: "Bears are omnivorous and eat berries, fish, and insects.", bad: false },
+    { text: "An omnivorous reader finishes novels, news, and science books.", bad: false },
+    { text: "Omnivores have teeth that can handle both plants and meat.", bad: false },
+    { text: "A true omnivore is simply a student who is good at both math and art.", bad: true }
+  ]},
+  { uid: "usage:catholic", lesson: 3, word: "catholic", explain: "Lowercase catholic means universal, including most things. Capitalized Catholic refers to the Roman Catholic Church. It does not mean picky.", wrongWhy: "Eating only carrots is narrow. Catholic tastes include most things.", options: [
+    { text: "Her catholic taste in music runs from opera to folk songs.", bad: false },
+    { text: "Because his interests are so catholic, he tries every club at school.", bad: false },
+    { text: "Spain is a largely Catholic country.", bad: false },
+    { text: "She is catholic about vegetables and will eat only carrots.", bad: true }
+  ]},
+  { uid: "usage:preclude", lesson: 3, word: "preclude", explain: "Preclude means to prevent or make impossible.", wrongWhy: "Warm sunshine does not prevent a picnic, so precluded is the wrong word.", options: [
+    { text: "A locked gate precluded a shortcut through the yard.", bad: false },
+    { text: "Heavy snow precluded the soccer game.", bad: false },
+    { text: "The posted warning precludes any claim that nobody told them.", bad: false },
+    { text: "Warm sunshine precluded the picnic, so everyone stayed inside.", bad: true }
+  ]},
+  { uid: "usage:overt", lesson: 4, word: "overt", explain: "Overt means done or shown openly.", wrongWhy: "A secret kept in a locked diary is hidden, which is the opposite of overt.", options: [
+    { text: "Their overt dislike showed in every rude remark.", bad: false },
+    { text: "The plan was overt, posted on the board for all to see.", bad: false },
+    { text: "He overtly refused the offer in front of the class.", bad: false },
+    { text: "She kept her overt secret hidden in a locked diary.", bad: true }
+  ]},
+  { uid: "usage:renegade", lesson: 4, word: "renegade", explain: "A renegade deserts a group, cause, or faith. Faithful is an antonym.", wrongWhy: "Someone who keeps every promise is faithful, not a renegade.", options: [
+    { text: "The renegade left the team and played for the rival school.", bad: false },
+    { text: "Renegade soldiers refused the orders of their own officers.", bad: false },
+    { text: "They called him a renegade after he abandoned the cause.", bad: false },
+    { text: "A renegade keeps every promise to the group.", bad: true }
+  ]},
+  { uid: "usage:panacea", lesson: 3, word: "panacea", explain: "A panacea is a cure-all, not a remedy for one rare problem.", wrongWhy: "A cure for a single rare symptom is not a panacea.", options: [
+    { text: "There is no panacea that fixes every problem at school.", bad: false },
+    { text: "The ad sold the juice as a panacea for all illness.", bad: false },
+    { text: "Extra sleep helps, but it is not a panacea.", bad: false },
+    { text: "A panacea is a cure that works for only one rare symptom.", bad: true }
+  ]},
+  { uid: "usage:cloister", lesson: 3, word: "cloister", explain: "A cloister is a covered walk or a place of seclusion. To cloister is to seclude.", wrongWhy: "Inviting the whole town in is the opposite of secluding people.", options: [
+    { text: "Monks walked and prayed in the cloister beside the courtyard.", bad: false },
+    { text: "The family tried to cloister the child from every worry.", bad: false },
+    { text: "During the epidemic many students were cloistered at home.", bad: false },
+    { text: "The open market cloistered shoppers by inviting the whole town in.", bad: true }
+  ]},
+  { uid: "usage:annihilate", lesson: 4, word: "annihilate", explain: "Annihilate means to destroy completely.", wrongWhy: "Adding one comma does not destroy a story completely.", options: [
+    { text: "The late frost annihilated the tomato plants.", bad: false },
+    { text: "They feared the storm would annihilate the pier.", bad: false },
+    { text: "The invasion nearly annihilated the small fleet.", bad: false },
+    { text: "The editor annihilated the story by adding a single comma.", bad: true }
+  ]},
+  { uid: "usage:vaunt", lesson: 4, word: "vaunt", explain: "Vaunt means to boast, or a boast.", wrongWhy: "Hiding a good grade is not bragging.", options: [
+    { text: "She began to vaunt the medal the moment she left the podium.", bad: false },
+    { text: "His vaunts about the new bike embarrassed his friends.", bad: false },
+    { text: "A gracious captain does not vaunt a win in the other team's face.", bad: false },
+    { text: "Quiet students vaunt when they hide a good grade from the class.", bad: true }
+  ]},
+  { uid: "usage:negate", lesson: 4, word: "negate", explain: "Negate means to disprove, cancel, or repeal.", wrongWhy: "Proving a result true confirms it. That does not negate it.", options: [
+    { text: "The new measurement negated the old theory.", bad: false },
+    { text: "A veto can negate a bill before it becomes a law.", bad: false },
+    { text: "One calm fact can negate a wild rumor.", bad: false },
+    { text: "The chart negated the result by proving it was true.", bad: true }
+  ]},
+  { uid: "usage:incipient", lesson: 4, word: "incipient", explain: "Incipient means in its early stages, just beginning.", wrongWhy: "The last chapter is an ending, not a beginning.", options: [
+    { text: "A scratchy throat can be the sign of an incipient cold.", bad: false },
+    { text: "The incipient storm was only a dark line on the horizon.", bad: false },
+    { text: "Her incipient smile faded when the bell rang.", bad: false },
+    { text: "The incipient chapter is the last one, after the story is over.", bad: true }
+  ]},
+  { uid: "usage:aperture", lesson: 4, word: "aperture", explain: "An aperture is an opening, especially one that admits light.", wrongWhy: "A solid door with no gap is not an opening.", options: [
+    { text: "She widened the aperture so the lens could gather more light.", bad: false },
+    { text: "Smoke left the tent through a small aperture at the top.", bad: false },
+    { text: "Stars showed through an aperture in the clouds.", bad: false },
+    { text: "The solid steel door was one wide aperture that blocked every draft.", bad: true }
+  ]}
 ];
 
-const TWIN = {
-  PAN: "OMNIS",
-  OMNIS: "PAN",
-  HOLOS: "TOTUS",
-  TOTUS: "HOLOS",
-  VANUS: "VACUUS",
-  VACUUS: "VANUS",
-  CLAUDO: "APERIO",
-  APERIO: "CLAUDO",
-  NIHIL: "NEGO",
-  NEGO: "NIHIL",
-  INCIPIO: "APERIO"
+const TWIN = { PAN: "OMNIS", OMNIS: "PAN", HOLOS: "TOTUS", TOTUS: "HOLOS", VANUS: "VACUUS", VACUUS: "VANUS", CLAUDO: "APERIO", APERIO: "CLAUDO", NIHIL: "NEGO", NEGO: "NIHIL", INCIPIO: "APERIO" };
+
+const ORDER = ["l3-def", "l3-root", "l3-blank", "l3-usage", "l3-boss", "l4-def", "l4-root", "l4-blank", "l4-usage", "l4-boss", "final"];
+
+const LEVELS = {
+  "l3-def": { name: "Gate of Names", kind: "level", type: "def", lesson: 3, blurb: "Meanings to words" },
+  "l3-root": { name: "Root Pit", kind: "level", type: "root", lesson: 3, blurb: "Words to roots" },
+  "l3-blank": { name: "Sentence Sands", kind: "level", type: "blank", lesson: 3, blurb: "Fill the blank" },
+  "l3-usage": { name: "False Tongue", kind: "level", type: "usage", lesson: 3, blurb: "Spot the bad use" },
+  "l3-boss": { name: "Titan of All", kind: "boss", lesson: 3, blurb: "Boss of Lesson 3", hp: 5 },
+  "l4-def": { name: "Empty Forum", kind: "level", type: "def", lesson: 4, blurb: "Meanings to words" },
+  "l4-root": { name: "Root Vault", kind: "level", type: "root", lesson: 4, blurb: "Words to roots" },
+  "l4-blank": { name: "Broken Lines", kind: "level", type: "blank", lesson: 4, blurb: "Fill the blank" },
+  "l4-usage": { name: "Lying Chorus", kind: "level", type: "usage", lesson: 4, blurb: "Spot the bad use" },
+  "l4-boss": { name: "Lord of Nothing", kind: "boss", lesson: 4, blurb: "Boss of Lesson 4", hp: 5 },
+  "final": { name: "Emperor of Roots", kind: "boss", lesson: 0, blurb: "Both lessons", hp: 7 }
 };
 
-const LETTERS = ["A", "B", "C", "D"];
+const RANKS = [
+  { name: "Novice", xp: 0 },
+  { name: "Scribe", xp: 80 },
+  { name: "Orator", xp: 250 },
+  { name: "Senator", xp: 600 },
+  { name: "Emperor", xp: 1100 }
+];
 
-function rootById(id) { return ROOTS.find((r) => r.id === id); }
-function wordByName(name) { return WORDS.find((w) => w.word === name); }
+const HATS = [
+  { id: "laurel", name: "Laurel wreath", price: 0, blurb: "Starter crown of the arena." },
+  { id: "helm", name: "Bronze helm", price: 40, blurb: "A fighter's lid." },
+  { id: "crest", name: "Gold crest", price: 80, blurb: "A showy arena plume." },
+  { id: "bolt", name: "Storm plume", price: 120, blurb: "Made for the lightning round." },
+  { id: "crown", name: "Imperial crown", price: 200, blurb: "The top of the ranks." }
+];
+
+const THEMES = [
+  { id: "marble", name: "Night marble", price: 0, color: "#241433" },
+  { id: "crimson", name: "Crimson sand", price: 50, color: "#e23d3d" },
+  { id: "aegean", name: "Aegean sea", price: 50, color: "#3ec6e0" },
+  { id: "purple", name: "Imperial purple", price: 90, color: "#c084fc" },
+  { id: "sun", name: "Sun forum", price: 90, color: "#ffb703" }
+];
 
 function defaultSave() {
   return {
-    known: {},
-    missed: [],
-    stats: { correct: 0, attempted: 0, streak: 0, bestStreak: 0 },
-    lesson: "both"
+    xp: 0, coins: 0, hat: "laurel", theme: "marble",
+    ownedHats: ["laurel"], ownedThemes: ["marble"],
+    stars: {}, bestCombo: 0, lightningBest: 0,
+    rematch: [], known: {}, totalCorrect: 0
   };
 }
 
@@ -844,928 +724,883 @@ function load() {
     if (!raw) return defaultSave();
     const data = JSON.parse(raw);
     const base = defaultSave();
-    return {
-      known: data.known || {},
-      missed: Array.isArray(data.missed) ? data.missed : [],
-      stats: Object.assign(base.stats, data.stats || {}),
-      lesson: data.lesson || "both"
-    };
+    base.xp = data.xp || 0;
+    base.coins = data.coins || 0;
+    base.hat = data.hat || "laurel";
+    base.theme = data.theme || "marble";
+    base.ownedHats = data.ownedHats || ["laurel"];
+    base.ownedThemes = data.ownedThemes || ["marble"];
+    base.stars = data.stars || {};
+    base.bestCombo = data.bestCombo || 0;
+    base.lightningBest = data.lightningBest || 0;
+    base.rematch = Array.isArray(data.rematch) ? data.rematch : [];
+    base.known = data.known || {};
+    base.totalCorrect = data.totalCorrect || 0;
+    return base;
   } catch (err) {
     return defaultSave();
   }
 }
 
 let save = load();
-let sessionScore = 0;
-let decks = { mc: [] };
-let pushed = false;
-
+let run = null;
 const ui = {
-  screen: "home",
-  mode: "home",
-  title: "",
-  queue: [],
-  index: 0,
-  flipped: false,
-  picked: null,
+  screen: "map",
   answered: false,
   feedback: null,
-  roundCorrect: 0,
-  roundTotal: 0,
   blank: "",
-  practice: false,
+  flipped: false,
   openWord: null,
   query: "",
-  match: null,
-  note: ""
+  studyLesson: "both",
+  flash: [],
+  flashIndex: 0,
+  tick: null,
+  lightTick: null,
+  flashT: null,
+  timerArmed: false,
+  lightArmed: false,
+  timeLeft: 0,
+  timeMax: 0,
+  deadline: 0,
+  lightEnds: 0
 };
 
 function persist() {
-  try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (err) { /* ignore quota */ }
+  try { localStorage.setItem(KEY, JSON.stringify(save)); } catch (err) { /* ignore */ }
 }
 
 function esc(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[c]));
 }
-
 function rich(text) {
   return String(text).split(/(\*[^*]+\*)/g).map((part) => {
-    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
-      return "<em>" + esc(part.slice(1, -1)) + "</em>";
-    }
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) return "<em>" + esc(part.slice(1, -1)) + "</em>";
     return esc(part);
   }).join("");
 }
-
 function shuffle(list) {
   const a = list.slice();
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const t = a[i];
-    a[i] = a[j];
-    a[j] = t;
+    const t = a[i]; a[i] = a[j]; a[j] = t;
   }
   return a;
 }
-
-function lessonOn(lesson) {
-  return save.lesson === "both" || String(save.lesson) === String(lesson);
+function take(list, n) { return shuffle(list).slice(0, n); }
+function rootById(id) { return ROOTS.find((r) => r.id === id); }
+function wordByName(name) { return WORDS.find((w) => w.word === name); }
+function wordsFor(lesson) { return WORDS.filter((w) => !lesson || w.lesson === lesson); }
+function starsOf(id) { return (save.stars && save.stars[id]) || 0; }
+function isUnlocked(id) {
+  const i = ORDER.indexOf(id);
+  if (i <= 0) return true;
+  return starsOf(ORDER[i - 1]) >= 1;
 }
-
-function scopedWords() {
-  return WORDS.filter((w) => lessonOn(w.lesson));
+function currentId() {
+  return ORDER.find((id) => isUnlocked(id) && !starsOf(id)) || "";
 }
-
-function knownCount() {
-  return scopedWords().filter((w) => save.known[w.word] === "known").length;
+function rankInfo(xp) {
+  let i = 0;
+  RANKS.forEach((r, idx) => { if (xp >= r.xp) i = idx; });
+  const cur = RANKS[i];
+  const next = RANKS[i + 1];
+  const pct = next ? (xp - cur.xp) / (next.xp - cur.xp) : 1;
+  return { name: cur.name, next: next ? next.name : "", pct: Math.max(0, Math.min(1, pct)), xp: xp };
 }
-
-function missedInScope() {
-  return save.missed.filter((item) => lessonOn(item.lesson));
-}
-
 function rootLabel(id) {
   const r = rootById(id);
-  return r.name + " · " + r.meaning;
+  return r.name + " means " + r.meaning;
 }
-
 function rootExplain(word, id) {
   const r = rootById(id);
   let text = word + " comes from " + r.name + ", " + r.lang + " for \"" + r.meaning + ".\"";
-  if (id === "VANUS" || id === "VACUUS") {
-    text += " VANUS and VACUUS both mean empty, but they are different roots.";
-  }
-  if (id === "PAN" || id === "OMNIS") {
-    text += " PAN is Greek and OMNIS is Latin. Both mean all.";
-  }
-  if (id === "HOLOS" || id === "TOTUS") {
-    text += " HOLOS is Greek and TOTUS is Latin. Both mean whole.";
-  }
+  if (id === "VANUS" || id === "VACUUS") text += " VANUS and VACUUS both mean empty, but they are different roots.";
+  if (id === "PAN" || id === "OMNIS") text += " PAN is Greek and OMNIS is Latin. Both mean all.";
+  if (id === "HOLOS" || id === "TOTUS") text += " HOLOS is Greek and TOTUS is Latin. Both mean whole.";
   return text;
 }
-
-function normalizeAnswer(raw) {
-  return String(raw || "").trim().replace(/\s+/g, " ").replace(/[.?!]+$/g, "");
-}
-
-function gradeBlank(item, raw) {
-  const cleaned = normalizeAnswer(raw);
-  if (!cleaned) return { empty: true };
-  const folded = cleaned.toLowerCase().replace(/^the\s+/, "");
-  if (item.near && item.near[folded]) {
-    return { ok: false, text: item.near[folded] + " " + item.explain };
-  }
-  if (!item.accept.includes(folded)) {
-    return { ok: false, text: "The answer is " + item.show + ". " + item.explain };
-  }
-  if (item.capital) {
-    const core = cleaned.replace(/^the\s+/i, "");
-    if (!core || core[0] !== "H") {
-      return { ok: false, text: "Almost. Capitalize the historical event: Holocaust. " + item.explain };
-    }
-  }
-  return { ok: true, text: item.explain };
-}
-
-function filledSentence(item) {
-  return item.sentence.replace("_____", item.show);
-}
-
-function record(ok, missItem) {
-  save.stats.attempted += 1;
-  ui.roundTotal += 1;
-  if (ok) {
-    save.stats.correct += 1;
-    save.stats.streak += 1;
-    sessionScore += 1;
-    ui.roundCorrect += 1;
-    if (save.stats.streak > save.stats.bestStreak) save.stats.bestStreak = save.stats.streak;
-    if (missItem) save.missed = save.missed.filter((m) => m.uid !== missItem.uid);
-  } else {
-    save.stats.streak = 0;
-    if (missItem && !save.missed.some((m) => m.uid === missItem.uid)) save.missed.push(missItem);
-  }
-  persist();
-}
-
-function feedbackKicker(ok) {
-  if (!ok) return "Not quite";
-  if (save.stats.streak >= 3) return "Correct, streak of " + save.stats.streak;
-  return "Correct";
-}
-
-function setFeedback(ok, text) {
-  ui.answered = true;
-  ui.feedback = { ok: ok, kicker: feedbackKicker(ok), text: text };
-}
-
 function choiceList(answer, wrong) {
-  return shuffle([answer].concat(wrong)).map((text) => ({ text: text, answer: text === answer }));
+  const uniq = [];
+  [answer].concat(wrong).forEach((t) => { if (t && !uniq.includes(t)) uniq.push(t); });
+  return shuffle(uniq).map((text) => ({ text: text, correct: text === answer }));
 }
-
 function distractorWords(answer, pool) {
   const names = pool.map((w) => w.word).filter((w) => w !== answer);
-  const preferred = CONFUSABLES[answer] || [];
   const out = [];
-  preferred.forEach((name) => {
-    if (name !== answer && !out.includes(name) && (names.includes(name) || wordByName(name))) out.push(name);
+  (CONFUSABLES[answer] || []).forEach((name) => {
+    if (name !== answer && !out.includes(name)) out.push(name);
   });
-  shuffle(names).forEach((name) => {
-    if (out.length < 3 && !out.includes(name)) out.push(name);
+  shuffle(names).forEach((name) => { if (out.length < 3 && !out.includes(name)) out.push(name); });
+  shuffle(WORDS.map((w) => w.word)).forEach((name) => {
+    if (out.length < 3 && name !== answer && !out.includes(name)) out.push(name);
   });
-  if (out.length < 3) {
-    shuffle(WORDS.map((w) => w.word)).forEach((name) => {
-      if (out.length < 3 && name !== answer && !out.includes(name)) out.push(name);
-    });
-  }
   return out.slice(0, 3);
 }
-
-function makeDefQuestion(w, def, suffix) {
-  const pool = WORDS.filter((other) => other.lesson === w.lesson);
-  const wrong = distractorWords(w.word, pool);
+function makeDef(w, def, suffix) {
+  const pool = WORDS.filter((o) => o.lesson === w.lesson);
   return {
-    uid: "mc:def:" + w.word + (suffix || ""),
-    mode: "mc",
-    lesson: w.lesson,
-    kind: "Definition",
-    heading: "Which word fits?",
-    word: "",
-    prompt: def,
-    choices: choiceList(w.word, wrong),
+    uid: "def:" + w.word + (suffix || ""),
+    type: "mc", qtype: "def", lesson: w.lesson,
+    heading: "Which word fits this meaning?",
+    word: "", prompt: def,
+    choices: choiceList(w.word, distractorWords(w.word, pool)),
     answer: w.word,
-    explain: w.word + " : " + def + " " + rootExplain(w.word, w.root)
+    explain: w.word + " means " + String(def).replace(/\.$/, "") + ". " + rootExplain(w.word, w.root)
   };
 }
-
-function makePhraseQuestion(spec, kind, heading) {
-  const base = wordByName(spec.base);
-  return {
-    uid: "mc:" + kind.toLowerCase() + ":" + spec.word,
-    mode: "mc",
-    lesson: base.lesson,
-    kind: kind,
-    heading: heading,
-    word: spec.word,
-    prompt: "",
-    choices: choiceList(spec.answer, spec.wrong),
-    answer: spec.answer,
-    explain: spec.explain
-  };
-}
-
-function makeRootQuestion(w) {
+function makeRoot(w) {
   const correct = rootLabel(w.root);
   const ids = [w.root];
-  const twin = TWIN[w.root];
-  if (twin) ids.push(twin);
-  shuffle(ROOTS.map((r) => r.id).filter((id) => !ids.includes(id))).forEach((id) => {
-    if (ids.length < 4) ids.push(id);
-  });
+  if (TWIN[w.root]) ids.push(TWIN[w.root]);
+  shuffle(ROOTS.map((r) => r.id).filter((id) => !ids.includes(id))).forEach((id) => { if (ids.length < 4) ids.push(id); });
   const labels = ids.map(rootLabel);
   return {
-    uid: "roots:" + w.word,
-    mode: "mc",
-    lesson: w.lesson,
-    kind: "Root",
+    uid: "root:" + w.word, type: "mc", qtype: "root", lesson: w.lesson,
     heading: "Which root does this word come from?",
-    word: w.word,
-    prompt: "",
-    choices: choiceList(correct, labels.filter((label) => label !== correct)),
+    word: w.word, prompt: "",
+    choices: choiceList(correct, labels.filter((l) => l !== correct)),
     answer: correct,
     explain: rootExplain(w.word, w.root)
   };
 }
-
-function buildMcPool() {
-  const words = scopedWords();
-  const items = [];
-  words.forEach((w) => {
-    items.push(makeDefQuestion(w, w.defs[0], ""));
-    if (w.defs[1] && w.word !== "catholic") items.push(makeDefQuestion(w, w.defs[1], ":2"));
-    if (w.word === "vanity" && w.defs[2]) items.push(makeDefQuestion(w, w.defs[2], ":3"));
-  });
-  SYNONYMS.forEach((spec) => {
-    const base = wordByName(spec.base);
-    if (base && lessonOn(base.lesson)) items.push(makePhraseQuestion(spec, "Synonym", "Which is closest in meaning?"));
-  });
-  ANTONYMS.forEach((spec) => {
-    const base = wordByName(spec.base);
-    if (base && lessonOn(base.lesson)) items.push(makePhraseQuestion(spec, "Antonym", "Which is most nearly the opposite?"));
-  });
-  return items;
-}
-
-function drawMc() {
-  if (!decks.mc.length) {
-    const all = buildMcPool();
-    const groups = ["Definition", "Synonym", "Antonym"].map((kind) => shuffle(all.filter((item) => item.kind === kind)));
-    const mixed = [];
-    const max = groups.reduce((n, list) => Math.max(n, list.length), 0);
-    for (let i = 0; i < max; i++) {
-      groups.forEach((list) => { if (list[i]) mixed.push(list[i]); });
-    }
-    decks.mc = mixed;
-  }
-  return decks.mc.splice(0, Math.min(10, decks.mc.length));
-}
-
-function buildFlash() {
-  return shuffle(scopedWords()).map((w) => ({
-    uid: "flash:" + w.word,
-    mode: "flash",
-    lesson: w.lesson,
-    word: w.word
-  }));
-}
-
-function buildBlanks() {
-  return shuffle(BLANKS.filter((item) => lessonOn(item.lesson)).map((item) => Object.assign({ mode: "blank" }, item)));
-}
-
-function buildUsage() {
-  return shuffle(USAGE.filter((item) => lessonOn(item.lesson))).map((item) => ({
-    uid: item.uid,
-    mode: "usage",
-    lesson: item.lesson,
-    word: item.word,
-    explain: item.explain,
-    wrongWhy: item.wrongWhy,
-    options: shuffle(item.options.map((opt) => Object.assign({}, opt)))
-  }));
-}
-
-function buildRootSets() {
-  let pool = shuffle(scopedWords());
-  const rounds = [];
-  while (pool.length) {
-    const round = [];
-    const used = new Set();
-    const remain = [];
-    pool.forEach((w) => {
-      if (round.length < 4 && !used.has(w.root)) {
-        round.push(w);
-        used.add(w.root);
-      } else remain.push(w);
-    });
-    rounds.push({
-      uid: "rootset:" + round.map((w) => w.word).join("-"),
-      mode: "roots",
-      lesson: save.lesson,
-      pairs: round.map((w) => ({ word: w.word, root: w.root, lesson: w.lesson }))
-    });
-    pool = remain;
-  }
-  return rounds;
-}
-
-function freshMatch(item) {
-  ui.match = {
-    words: shuffle(item.pairs.map((p) => Object.assign({ state: "open" }, p))),
-    roots: shuffle(item.pairs.map((p) => ({ id: p.root, state: "open", word: "" }))),
-    selected: null
+function makePhrase(spec, kind) {
+  const base = wordByName(spec.base);
+  return {
+    uid: kind + ":" + spec.word, type: "mc", qtype: kind, lesson: base.lesson,
+    heading: kind === "syn" ? "Which is closest in meaning?" : "Which is most nearly the opposite?",
+    word: spec.word, prompt: "",
+    choices: choiceList(spec.answer, spec.wrong),
+    answer: spec.answer, explain: spec.explain
   };
-  ui.note = "";
 }
-
-function startMode(mode, practice) {
-  if (mode === "study") {
-    ui.mode = "study";
-    ui.screen = "study";
-    ui.title = "Study";
-    ui.query = "";
-    ui.openWord = null;
-    rememberPlace();
-    render();
-    return;
+function makeBlank(item) {
+  return {
+    uid: item.uid, type: "blank", qtype: "blank", lesson: item.lesson,
+    heading: "Fill in the missing word.",
+    sentence: item.sentence, accept: item.accept, show: item.show,
+    explain: item.explain, near: item.near || null, capital: !!item.capital,
+    answer: item.show
+  };
+}
+function makeUsage(item) {
+  const bad = item.options.find((o) => o.bad);
+  return {
+    uid: item.uid, type: "usage", qtype: "usage", lesson: item.lesson,
+    heading: "Which sentence uses the word wrong?",
+    word: item.word,
+    options: shuffle(item.options.map((o) => ({ text: o.text, bad: o.bad }))),
+    answer: bad.text,
+    explain: item.wrongWhy + " " + item.explain
+  };
+}
+function lessonSpecs(list, lesson) {
+  return list.filter((spec) => wordByName(spec.base).lesson === lesson);
+}
+function buildLevelQueue(meta) {
+  const lesson = meta.lesson;
+  if (meta.type === "def") return take(wordsFor(lesson).map((w) => makeDef(w, w.defs[0])), 5);
+  if (meta.type === "root") return take(wordsFor(lesson).map(makeRoot), 5);
+  if (meta.type === "blank") return take(BLANKS.filter((b) => b.lesson === lesson).map(makeBlank), 5);
+  if (meta.type === "usage") return take(USAGE.filter((u) => u.lesson === lesson).map(makeUsage), 5);
+  return [];
+}
+function buildBossQueue(lesson) {
+  if (!lesson) {
+    return shuffle([].concat(
+      take(WORDS, 4).map((w) => makeDef(w, w.defs[0])),
+      take(WORDS, 2).map(makeRoot),
+      take(SYNONYMS, 2).map((s) => makePhrase(s, "syn")),
+      take(ANTONYMS, 2).map((s) => makePhrase(s, "ant"))
+    ));
   }
-  ui.practice = !!practice || mode === "practice";
-  ui.mode = mode;
-  ui.index = 0;
-  ui.flipped = false;
-  ui.picked = null;
-  ui.answered = false;
-  ui.feedback = null;
-  ui.roundCorrect = 0;
-  ui.roundTotal = 0;
-  ui.blank = "";
-  ui.note = "";
-  ui.match = null;
-  if (ui.practice) {
-    ui.title = "Practice";
-    ui.queue = shuffle(missedInScope().map((item) => Object.assign({}, item)));
-  } else if (mode === "flash") {
-    ui.title = "Flashcards";
-    ui.queue = buildFlash();
-  } else if (mode === "mc") {
-    ui.title = "Multiple choice";
-    ui.queue = drawMc();
-  } else if (mode === "blank") {
-    ui.title = "Fill in the blank";
-    ui.queue = buildBlanks();
-  } else if (mode === "usage") {
-    ui.title = "Usage judge";
-    ui.queue = buildUsage();
-  } else if (mode === "roots") {
-    ui.title = "Root match";
-    ui.queue = buildRootSets();
+  return shuffle([].concat(
+    take(wordsFor(lesson), 3).map((w) => makeDef(w, w.defs[0])),
+    take(wordsFor(lesson), 2).map(makeRoot),
+    take(lessonSpecs(SYNONYMS, lesson), 2).map((s) => makePhrase(s, "syn")),
+    take(lessonSpecs(ANTONYMS, lesson), 1).map((s) => makePhrase(s, "ant"))
+  ));
+}
+function buildLightningDeck() {
+  return shuffle([].concat(
+    WORDS.map((w) => makeDef(w, w.defs[0])),
+    SYNONYMS.map((s) => makePhrase(s, "syn")),
+    WORDS.map(makeRoot)
+  ));
+}
+function normalizeAnswer(raw) {
+  return String(raw || "").trim().replace(/\s+/g, " ").replace(/[.?!]+$/g, "");
+}
+function gradeBlank(item, raw) {
+  const cleaned = normalizeAnswer(raw);
+  if (!cleaned) return { empty: true };
+  const folded = cleaned.toLowerCase().replace(/^the\s+/, "");
+  if (item.near && item.near[folded]) return { ok: false, text: item.near[folded] + " " + item.explain };
+  if (!item.accept.includes(folded)) return { ok: false, text: "The answer is " + item.show + ". " + item.explain };
+  if (item.capital) {
+    const core = cleaned.replace(/^the\s+/i, "");
+    if (!core || core[0] !== "H") return { ok: false, text: "Almost. Capitalize the historical event: Holocaust. " + item.explain };
+  }
+  return { ok: true, text: item.explain };
+}
+function filledSentence(item) {
+  return String(item.sentence || "").replace("_____", item.show);
+}
+function timeFor(q) {
+  if (!q) return 0;
+  if (q.type === "blank") return 24;
+  if (q.type === "usage") return 20;
+  if (q.qtype === "root") return 14;
+  return 16;
+}
+function current() {
+  if (!run || !run.queue) return null;
+  return run.queue[run.index] || null;
+}
+function clearQuestionTimer() {
+  if (ui.tick) clearInterval(ui.tick);
+  ui.tick = null;
+  ui.timerArmed = false;
+}
+function clearAll() {
+  clearQuestionTimer();
+  if (ui.lightTick) clearInterval(ui.lightTick);
+  ui.lightTick = null;
+  ui.lightArmed = false;
+  if (ui.flashT) clearTimeout(ui.flashT);
+  ui.flashT = null;
+}
+function freshRun(partial) {
+  run = Object.assign({
+    kind: "level", levelId: "", name: "", queue: [], index: 0,
+    score: 0, correct: 0, total: 0, combo: 0, bestCombo: 0,
+    hp: 0, maxHp: 0, hearts: 3, coinMult: 1,
+    coinsEarned: 0, xpEarned: 0, over: false, win: false,
+    stars: 0, justHit: false, justHurt: false, record: false,
+    rankedUp: false, rankName: "", xpGain: 0, coinGain: 0
+  }, partial);
+}
+function startLevel(id) {
+  if (id !== "rematch" && !isUnlocked(id)) { toast("Win the previous trial first."); return; }
+  clearAll();
+  const meta = LEVELS[id];
+  let queue = [];
+  let kind = "level";
+  let hp = 0;
+  let coinMult = 1;
+  if (id === "rematch") {
+    if (!save.rematch.length) { toast("No rivals waiting yet."); return; }
+    queue = take(save.rematch, 6).map((q) => JSON.parse(JSON.stringify(q)));
+    kind = "rematch";
+    coinMult = 2;
+  } else if (meta.kind === "boss") {
+    queue = buildBossQueue(meta.lesson);
+    kind = "boss";
+    hp = meta.hp;
   } else {
-    ui.queue = [];
+    queue = buildLevelQueue(meta);
   }
-  if (!ui.queue.length) {
-    ui.screen = "empty";
-  } else {
-    ui.screen = "play";
-    if (ui.queue[0].mode === "roots") freshMatch(ui.queue[0]);
-  }
-  rememberPlace();
-  render();
-}
-
-function showHome() {
-  ui.screen = "home";
-  ui.mode = "home";
-  ui.feedback = null;
-  ui.answered = false;
-  render();
-}
-
-function rememberPlace() {
-  if (pushed) return;
-  try {
-    history.pushState({ mode: true }, "");
-    pushed = true;
-  } catch (err) {
-    pushed = false;
-  }
-}
-
-function goHome() {
-  if (pushed) {
-    pushed = false;
-    try {
-      history.back();
-      return;
-    } catch (err) { /* file pages may block history */ }
-  }
-  showHome();
-}
-
-function currentItem() {
-  return ui.queue[ui.index];
-}
-
-function advance() {
-  ui.index += 1;
-  ui.flipped = false;
-  ui.picked = null;
+  if (!queue.length) { toast("Nothing is queued for that trial."); return; }
+  freshRun({
+    kind: kind, levelId: id, name: id === "rematch" ? "Rematch" : meta.name,
+    queue: queue, hp: hp, maxHp: hp, coinMult: coinMult
+  });
+  ui.screen = "play";
   ui.answered = false;
   ui.feedback = null;
   ui.blank = "";
-  ui.note = "";
-  ui.match = null;
-  if (ui.index >= ui.queue.length) {
-    ui.screen = "results";
-  } else if (currentItem().mode === "roots") {
-    freshMatch(currentItem());
-  }
+  ui.picked = null;
+  ui.timeLeft = 0;
   render();
 }
-
-function onChoose(choiceIndex) {
-  if (ui.answered) return;
-  const item = currentItem();
-  const choice = item.choices[choiceIndex];
-  ui.picked = choiceIndex;
-  const ok = !!choice.answer;
-  record(ok, item);
-  const lead = ok ? item.explain : "The answer is " + item.answer + ". " + item.explain;
-  setFeedback(ok, lead);
+function startLightning() {
+  clearAll();
+  const deck = buildLightningDeck();
+  freshRun({ kind: "lightning", levelId: "lightning", name: "Lightning Round", queue: deck, coinMult: 1 });
+  ui.screen = "play";
+  ui.answered = false;
+  ui.feedback = null;
+  ui.lightEnds = Date.now() + 60000;
   render();
 }
-
-function onUsage(optIndex) {
-  if (ui.answered) return;
-  const item = currentItem();
-  const opt = item.options[optIndex];
-  ui.picked = optIndex;
-  const ok = !!opt.bad;
-  record(ok, item);
-  const text = ok
-    ? item.wrongWhy + " " + item.explain
-    : "Not that one. " + item.wrongWhy + " " + item.explain;
-  setFeedback(ok, text);
-  render();
-}
-
-function onBlank() {
-  if (ui.answered) return;
-  const item = currentItem();
-  const result = gradeBlank(item, ui.blank);
-  if (result.empty) return;
-  record(result.ok, item);
-  const sentence = filledSentence(item);
-  setFeedback(result.ok, result.text + " " + sentence.replace(/\*/g, ""));
-  render();
-}
-
-function onKnow(kind) {
-  const item = currentItem();
-  const name = item.word;
-  save.known[name] = kind;
-  if (kind === "known") save.missed = save.missed.filter((m) => m.uid !== item.uid);
-  else if (!save.missed.some((m) => m.uid === item.uid)) save.missed.push(item);
-  persist();
-  advance();
-}
-
-function onMatchWord(word) {
-  if (!ui.match) return;
-  const card = ui.match.words.find((w) => w.word === word);
-  if (!card || card.state !== "open") return;
-  ui.match.selected = word;
-  ui.note = "";
+function startDrill() {
+  clearAll();
+  const queue = take(WORDS, 6).map((w) => makeDef(w, w.defs[0]));
+  freshRun({ kind: "drill", levelId: "drill", name: "Quiet Drill", queue: queue, coinMult: 0 });
+  ui.screen = "play";
+  ui.answered = false;
   ui.feedback = null;
   render();
 }
-
-function onMatchRoot(rootId) {
-  if (!ui.match) return;
-  const rootBtn = ui.match.roots.find((r) => r.id === rootId && r.state === "open");
-  if (!rootBtn) return;
-  if (!ui.match.selected) {
-    ui.note = "Tap a word first.";
-    render();
-    return;
+function noteResult(q, ok) {
+  if (!q) return;
+  if (ok) save.rematch = save.rematch.filter((r) => r.uid !== q.uid);
+  else if (!save.rematch.some((r) => r.uid === q.uid)) {
+    save.rematch.push(JSON.parse(JSON.stringify(q)));
+    if (save.rematch.length > 30) save.rematch = save.rematch.slice(-30);
   }
-  const card = ui.match.words.find((w) => w.word === ui.match.selected);
-  const ok = card.root === rootId;
-  card.state = ok ? "right" : "wrong";
+}
+function multOf(combo) { return Math.max(1, Math.min(4, combo)); }
+function resolve(ok, explain) {
+  if (ui.answered || !run || run.over) return;
+  const q = current();
+  ui.answered = true;
+  clearQuestionTimer();
+  run.total += 1;
+  run.justHit = false;
+  run.justHurt = false;
+  noteResult(q, ok);
+  let pts = 0;
+  let mult = 1;
   if (ok) {
-    rootBtn.state = "right";
-    rootBtn.word = card.word;
+    run.combo += 1;
+    run.bestCombo = Math.max(run.bestCombo, run.combo);
+    save.bestCombo = Math.max(save.bestCombo || 0, run.combo);
+    mult = multOf(run.combo);
+    const speed = ui.timeLeft || 0;
+    pts = Math.round((100 + speed * 8) * mult);
+    if (run.kind === "lightning") pts = (80 + (speed > 4 ? 40 : 0)) * mult;
+    run.score += pts;
+    run.correct += 1;
+    const purse = (4 + Math.ceil(speed / 4)) * mult * (run.coinMult || 0);
+    if (run.kind !== "drill") run.coinsEarned += purse;
+    run.xpEarned += 10 + mult * 3;
+    if (run.kind === "boss") {
+      run.hp = Math.max(0, run.hp - 1);
+      run.justHit = true;
+    }
   } else {
-    const correctBtn = ui.match.roots.find((r) => r.id === card.root && r.state === "open");
-    if (correctBtn) {
-      correctBtn.state = "shown";
-      correctBtn.word = card.word;
+    run.combo = 0;
+    if (run.kind === "boss") {
+      run.hearts -= 1;
+      run.justHurt = true;
     }
   }
-  ui.match.selected = null;
-  ui.note = "";
-  const w = wordByName(card.word);
-  const missItem = makeRootQuestion(w);
-  record(ok, missItem);
-  const picked = rootById(rootId);
-  const text = ok
-    ? rootExplain(card.word, card.root)
-    : "Not a match. You chose " + picked.name + ", meaning " + picked.meaning + ". " + rootExplain(card.word, card.root);
-  ui.feedback = { ok: ok, kicker: feedbackKicker(ok), text: text };
-  const done = ui.match.words.every((entry) => entry.state !== "open");
-  ui.answered = done;
-  render();
-}
-
-function setLesson(lesson) {
-  save.lesson = lesson;
-  decks.mc = [];
+  let extra = "";
+  if (ok && run.kind !== "drill") extra = " +" + pts + " points. Combo x" + mult + ".";
+  if (!ok && run.combo === 0 && run.kind !== "drill") extra = " Combo lost.";
+  if (run.kind === "boss" && ok) extra += " The boss loses a chunk of HP.";
+  if (run.kind === "boss" && !ok) extra += " A heart breaks. " + Math.max(0, run.hearts) + " left.";
+  ui.feedback = { ok: ok, text: explain + extra, pts: pts, mult: mult };
   persist();
   render();
-}
-
-function toggleOpen(word) {
-  ui.openWord = ui.openWord === word ? null : word;
-  render();
-}
-
-function markStudy(word, kind) {
-  save.known[word] = kind;
-  const uid = "flash:" + word;
-  const w = wordByName(word);
-  if (kind === "known") save.missed = save.missed.filter((m) => m.uid !== uid);
-  else if (!save.missed.some((m) => m.uid === uid)) {
-    save.missed.push({ uid: uid, mode: "flash", lesson: w.lesson, word: word });
+  juice(ok, ok ? ((run.kind === "boss" ? "HIT +" : "+") + pts) : "");
+  if (run.kind === "lightning") {
+    ui.flashT = setTimeout(() => {
+      if (!run || run.over) return;
+      if (Date.now() >= ui.lightEnds) finish(true);
+      else goNext(true);
+    }, 420);
   }
-  persist();
-  render();
 }
-
-function resetProgress() {
-  if (!confirm("Clear saved progress on this device?")) return;
-  save = defaultSave();
-  sessionScore = 0;
-  decks.mc = [];
-  persist();
-  localStorage.removeItem(KEY);
-  render();
+function onTimeout() {
+  if (ui.answered || !run) return;
+  const q = current();
+  if (!q) return;
+  if (q.type === "blank") resolve(false, "Time is up. The answer is " + q.show + ". " + q.explain);
+  else if (q.type === "usage") resolve(false, "Time is up. The wrong sentence was: " + q.answer + " " + q.explain);
+  else resolve(false, "Time is up. The answer is " + q.answer + ". " + q.explain);
 }
-
-function headerStats() {
-  const hot = save.stats.streak >= 3 ? " hot" : "";
-  if (ui.screen !== "home") {
-    return '<p class="slim' + hot + '">Score ' + sessionScore + ' · Streak ' + save.stats.streak + ' · Known ' + knownCount() + '/' + scopedWords().length + '</p>';
+function goNext(fromFlash) {
+  if (!run || run.over) return;
+  if (!fromFlash && run.kind === "lightning") return;
+  if (run.kind === "boss") {
+    if (run.hp <= 0) return finish(true);
+    if (run.hearts <= 0) return finish(false);
   }
-  return (
-    '<div class="stats">' +
-      '<div class="stat"><b>' + sessionScore + '</b><span>Score</span></div>' +
-      '<div class="stat' + hot + '"><b>' + save.stats.streak + '</b><span>Streak</span></div>' +
-      '<div class="stat"><b>' + knownCount() + '/' + scopedWords().length + '</b><span>Known</span></div>' +
-    '</div>'
-  );
+  if (run.index + 1 >= run.queue.length) {
+    if (run.kind === "lightning") {
+      run.queue = run.queue.concat(buildLightningDeck());
+    } else if (run.kind === "boss" && run.hp > 0) {
+      return finish(false);
+    } else {
+      return finish(true);
+    }
+  }
+  run.index += 1;
+  ui.answered = false;
+  ui.feedback = null;
+  ui.blank = "";
+  ui.picked = null;
+  ui.timeLeft = 0;
+  ui.timerArmed = false;
+  run.justHit = false;
+  run.justHurt = false;
+  render();
 }
-
-function shell(body) {
-  return headerStats() + '<div class="rule"></div>' + body;
+function finish(win) {
+  if (!run || run.over) return;
+  run.over = true;
+  run.win = !!win;
+  clearAll();
+  const before = rankInfo(save.xp).name;
+  let xpGain = run.xpEarned;
+  let coinGain = 0;
+  if (run.kind === "drill") xpGain = Math.round(run.xpEarned / 2);
+  if (run.kind === "level" || run.kind === "boss") {
+    if (win) {
+      const acc = run.correct / Math.max(1, run.total);
+      let stars = 1;
+      if (acc >= 0.9) stars = 3;
+      else if (acc >= 0.6) stars = 2;
+      const prev = starsOf(run.levelId);
+      save.stars[run.levelId] = Math.max(prev, stars);
+      run.stars = stars;
+      coinGain = run.coinsEarned + 10 * stars;
+    } else run.stars = 0;
+  } else if (run.kind === "rematch" || run.kind === "lightning") {
+    coinGain = run.coinsEarned;
+    if (run.kind === "lightning" && run.score > (save.lightningBest || 0)) {
+      run.record = true;
+      save.lightningBest = run.score;
+    }
+  }
+  save.xp += xpGain;
+  save.coins += coinGain;
+  save.totalCorrect = (save.totalCorrect || 0) + run.correct;
+  run.xpGain = xpGain;
+  run.coinGain = coinGain;
+  run.rankName = rankInfo(save.xp).name;
+  run.rankedUp = run.rankName !== before;
+  persist();
+  ui.screen = "result";
+  render();
+  if (win) juice(true, "");
 }
-
-function nav(title, countLabel) {
-  return (
-    '<div class="nav">' +
-      '<button class="ghost" data-act="home" style="min-height:48px;padding:10px 12px">Home</button>' +
-      '<h2>' + esc(title) + '</h2>' +
-      '<span class="fine" style="margin:0">' + esc(countLabel) + '</span>' +
-    '</div>'
-  );
+function retreat() {
+  clearAll();
+  ui.screen = "map";
+  ui.answered = false;
+  ui.feedback = null;
+  render();
 }
-
-function feedbackHTML() {
-  if (!ui.feedback) return "";
-  return (
-    '<div class="feedback ' + (ui.feedback.ok ? "good" : "bad") + '" role="status">' +
-      '<p class="fk">' + esc(ui.feedback.kicker) + '</p>' +
-      '<p>' + esc(ui.feedback.text) + '</p>' +
-    '</div>'
-  );
+function armTimer() {
+  if (ui.timerArmed || !run || run.over || ui.answered) return;
+  if (run.kind === "lightning" || run.kind === "drill") return;
+  const q = current();
+  ui.timeMax = timeFor(q);
+  if (!ui.timeMax) return;
+  ui.timerArmed = true;
+  ui.deadline = Date.now() + ui.timeMax * 1000;
+  ui.timeLeft = ui.timeMax;
+  ui.tick = setInterval(() => {
+    if (!run || ui.answered) return;
+    ui.timeLeft = Math.max(0, (ui.deadline - Date.now()) / 1000);
+    const bar = document.getElementById("timebar");
+    const num = document.getElementById("timenum");
+    const wrap = document.getElementById("timer");
+    if (!bar) { clearQuestionTimer(); return; }
+    bar.style.width = (ui.timeLeft / ui.timeMax * 100) + "%";
+    if (num) num.textContent = String(Math.ceil(ui.timeLeft));
+    if (wrap) wrap.classList.toggle("low", ui.timeLeft <= 5);
+    if (num) num.classList.toggle("low", ui.timeLeft <= 5);
+    if (ui.timeLeft <= 0) onTimeout();
+  }, 100);
 }
-
-function renderHome() {
-  const waiting = missedInScope().length;
-  const modes = [
-    ["study", "Study", "Definitions and roots"],
-    ["flash", "Flashcards", "Flip, then mark it"],
-    ["mc", "Multiple choice", "Meaning and opposites"],
-    ["blank", "Fill in the blank", "Type the word"],
-    ["roots", "Root match", "Word to its root"],
-    ["usage", "Usage judge", "Spot the bad sentence"]
-  ];
-  const buttons = modes.map((m, i) => (
-    '<button class="mode" data-act="start" data-mode="' + m[0] + '">' +
-      '<span class="num">' + (i + 1) + '</span>' +
-      '<span><span class="name">' + m[1] + '</span><span class="blurb">' + m[2] + '</span></span>' +
-    '</button>'
-  )).join("");
-  const practice = (
-    '<button class="mode wide" data-act="practice"' + (waiting ? "" : " disabled") + '>' +
-      '<span class="num">+</span>' +
-      '<span><span class="name">Practice missed</span><span class="blurb">' +
-        (waiting ? "Retry items you missed or marked to practice." : "Miss a question and it will wait here.") +
-      '</span></span>' +
-      (waiting ? '<span class="badge">' + waiting + '</span>' : "") +
-    '</button>'
-  );
-  return (
-    '<p class="kicker">Classical roots · Lessons 3 and 4</p>' +
-    '<h1>All or Nothing</h1>' +
-    '<p class="deck">Twenty-two words from ten Greek and Latin roots.</p>' +
-    '<div class="seg" role="group" aria-label="Lesson filter">' +
-      '<button data-act="lesson" data-lesson="3" aria-pressed="' + (save.lesson === "3") + '">Lesson 3</button>' +
-      '<button data-act="lesson" data-lesson="4" aria-pressed="' + (save.lesson === "4") + '">Lesson 4</button>' +
-      '<button data-act="lesson" data-lesson="both" aria-pressed="' + (save.lesson === "both") + '">Both</button>' +
-    '</div>' +
-    '<p class="fine">Best streak ' + save.stats.bestStreak + '. Progress stays on this device.</p>' +
-    headerStats() +
-    '<div class="rule"></div>' +
-    '<div class="modes">' + buttons + practice + '</div>' +
-    '<div class="foot"><button class="linkish" data-act="reset">Reset saved progress</button></div>'
-  );
+function armLightning() {
+  if (ui.lightArmed || !run || run.kind !== "lightning" || run.over) return;
+  ui.lightArmed = true;
+  if (!ui.lightEnds) ui.lightEnds = Date.now() + 60000;
+  ui.lightTick = setInterval(() => {
+    const left = ui.lightEnds - Date.now();
+    const num = document.getElementById("timenum");
+    if (num) num.textContent = String(Math.max(0, Math.ceil(left / 1000)));
+    if (left <= 0) finish(true);
+  }, 100);
 }
-
-function renderEmpty() {
-  const msg = ui.practice
-    ? "The practice queue is empty for this lesson. Miss a question, or mark a card as still learning, and it will wait here."
-    : "Nothing is waiting in this round. Try the other lesson, or choose Both.";
-  return shell(
-    nav(ui.title || "Practice", "") +
-    '<div class="card"><p class="prompt">' + esc(msg) + '</p></div>' +
-    '<div class="actions"><button class="primary" data-act="home">Back home</button></div>'
-  );
+function juice(ok, label) {
+  const app = document.getElementById("app");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce && app && !ok) {
+    app.classList.remove("shake");
+    void app.offsetWidth;
+    app.classList.add("shake");
+  }
+  if (!reduce && ok) {
+    for (let i = 0; i < 16; i++) {
+      const bit = document.createElement("i");
+      bit.className = "bit";
+      const colors = ["#f0c14a", "#e23d3d", "#fff6d0", "#7ecbff", "#b6f0a0"];
+      bit.style.background = colors[i % colors.length];
+      bit.style.left = (40 + Math.random() * 20) + "%";
+      bit.style.top = "42%";
+      bit.style.setProperty("--dx", (Math.random() * 180 - 90) + "px");
+      bit.style.setProperty("--dy", (Math.random() * 160 - 120) + "px");
+      document.body.appendChild(bit);
+      setTimeout(() => bit.remove(), 750);
+    }
+  }
+  if (label) {
+    const flo = document.createElement("div");
+    flo.className = "float";
+    flo.textContent = label;
+    document.body.appendChild(flo);
+    setTimeout(() => flo.remove(), 800);
+  }
 }
-
-function renderFlash(item) {
-  const w = wordByName(item.word);
-  const r = rootById(w.root);
-  const defs = w.defs.map((d) => '<p class="def">' + esc(d) + '</p>').join("");
-  const examples = w.examples.map((ex) => '<p class="example">' + esc(ex) + '</p>').join("");
-  const forms = w.forms.length ? '<p class="note">Also: ' + esc(w.forms.join(", ")) + '</p>' : "";
-  const note = w.note ? '<p class="note">' + esc(w.note) + '</p>' : "";
-  const mark = save.known[w.word] === "known" ? "Known" : (save.known[w.word] === "practice" ? "Needs practice" : "New");
-  return shell(
-    nav("Flashcards", (ui.index + 1) + " / " + ui.queue.length) +
-    '<div class="progress"><span style="width:' + Math.round((ui.index / ui.queue.length) * 100) + '%"></span></div>' +
-    '<div class="flip' + (ui.flipped ? " is-flipped" : "") + '">' +
-      '<div class="flip-inner">' +
-        '<div class="face front card" data-act="flip" tabindex="0" role="button" aria-label="Flip card">' +
-          '<p class="tag">Lesson ' + w.lesson + (w.challenge ? " · Challenge" : "") + '</p>' +
-          '<p class="word">' + esc(w.word) + '</p>' +
-          '<p class="pos">' + esc(w.pos) + '</p>' +
-          '<p class="hint">' + mark + '</p>' +
-          '<p class="tapnote">Tap the card for the definition, root, and example.</p>' +
-        '</div>' +
-        '<div class="face back card">' +
-          '<p class="tag">' + esc(w.word) + '</p>' +
-          defs +
-          '<p class="rootchip">' + esc(r.name) + ' · ' + esc(r.lang) + ' · ' + esc(r.meaning) + '</p>' +
-          '<p class="note">' + esc(r.parts) + '</p>' +
-          examples + forms + note +
-          '<div class="row" style="margin-top:14px">' +
-            '<button class="ghost" data-act="learn" data-stop="1">Still learning</button>' +
-            '<button class="primary" data-act="know" data-stop="1">I know this</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>'
-  );
+function toast(msg) {
+  const old = document.querySelector(".toast");
+  if (old) old.remove();
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
 }
-
-function renderMc(item) {
-  const choices = item.choices.map((choice, i) => {
-    let cls = "choice";
-    if (ui.answered && choice.answer) cls += " is-right";
-    else if (ui.answered && ui.picked === i) cls += " is-wrong";
-    return '<button class="' + cls + '" data-act="choose" data-i="' + i + '"' + (ui.answered ? " disabled" : "") + '>' +
-      '<span class="letter">' + LETTERS[i] + '</span> ' + esc(choice.text) + '</button>';
-  }).join("");
-  const head = item.word ? '<p class="word">' + esc(item.word) + '</p>' : "";
-  const prompt =
-    '<p class="prompt">' + esc(item.heading) + '</p>' +
-    (item.prompt ? '<p class="prompt">"' + esc(item.prompt) + '"</p>' : "");
-  return shell(
-    nav(ui.practice ? "Practice" : "Multiple choice", (ui.index + 1) + " / " + ui.queue.length) +
-    '<div class="card">' +
-      '<p class="tag">' + esc(item.kind) + ' · Lesson ' + item.lesson + '</p>' +
-      head + prompt +
-      '<div class="choices">' + choices + '</div>' +
-      feedbackHTML() +
-    '</div>' +
-    (ui.answered ? '<div class="actions"><button class="primary" data-act="next">Next</button></div>' : '<p class="hint">Choose the best answer. Keys 1 to 4 work too.</p>')
-  );
+function coinSVG() {
+  return '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#f0c14a" stroke="#8a6418" stroke-width="1.5"/><circle cx="9" cy="9" r="4" fill="none" stroke="#8a6418" stroke-width="1.2"/></svg>';
 }
-
-function renderBlank(item) {
-  const shown = ui.answered
-    ? rich(item.sentence).replace("_____", '<span class="gap">' + esc(item.show) + '</span>')
-    : rich(item.sentence).replace("_____", '<span class="gap">&nbsp;</span>');
-  return shell(
-    nav(ui.practice ? "Practice" : "Fill in the blank", (ui.index + 1) + " / " + ui.queue.length) +
-    '<div class="card">' +
-      '<p class="tag">Lesson ' + item.lesson + '</p>' +
-      '<p class="prompt">' + shown + '</p>' +
-      (ui.answered ? "" :
-        '<input class="blankbox" id="blank" data-act="blankinput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type the word" value="' + esc(ui.blank) + '">') +
-      feedbackHTML() +
-    '</div>' +
-    '<div class="actions">' +
-      (ui.answered
-        ? '<button class="primary" data-act="next">Next</button>'
-        : '<button class="primary" id="check" data-act="check"' + (ui.blank.trim() ? "" : " disabled") + '>Check</button>') +
-    '</div>'
-  );
+function heartSVG() {
+  return '<svg viewBox="0 0 24 22"><path fill="#e23d3d" d="M12 20s-7-4.4-9.5-8.5C.6 8.6 1.4 5 4.4 3.6 6.6 2.6 9 3.4 12 6.2 15 3.4 17.4 2.6 19.6 3.6c3 1.4 3.8 5 .9 7.9C19 15.6 12 20 12 20z"/></svg>';
 }
-
-function renderUsage(item) {
-  const options = item.options.map((opt, i) => {
-    let cls = "choice";
-    if (ui.answered && opt.bad) cls += " is-right";
-    else if (ui.answered && ui.picked === i && !opt.bad) cls += " is-wrong";
-    return '<button class="' + cls + '" data-act="usage" data-i="' + i + '"' + (ui.answered ? " disabled" : "") + '>' +
-      '<span class="letter">' + LETTERS[i] + '</span> ' + esc(opt.text) + '</button>';
-  }).join("");
-  return shell(
-    nav(ui.practice ? "Practice" : "Usage judge", (ui.index + 1) + " / " + ui.queue.length) +
-    '<div class="card">' +
-      '<p class="tag">Lesson ' + item.lesson + '</p>' +
-      '<p class="word">' + esc(item.word) + '</p>' +
-      '<p class="prompt">Which sentence uses the word incorrectly?</p>' +
-      '<div class="choices">' + options + '</div>' +
-      feedbackHTML() +
-    '</div>' +
-    (ui.answered ? '<div class="actions"><button class="primary" data-act="next">Next</button></div>' : "")
-  );
+function starSVG() {
+  return '<svg viewBox="0 0 24 24"><path fill="#f0c14a" d="M12 2.6l2.7 5.6 6.2.9-4.5 4.3 1.1 6.1L12 16.8 6.5 19.5l1.1-6.1L3.1 9.1l6.2-.9z"/></svg>';
 }
-
-function renderRoots() {
-  const m = ui.match;
-  const words = m.words.map((card) => {
-    const cls = "chip" + (m.selected === card.word ? " on" : "") + (card.state === "right" ? " right" : "") + (card.state === "wrong" ? " wrong" : "");
-    const sub = card.state === "open" ? "Tap, then choose a root" : rootLabel(card.root);
-    return '<button class="' + cls + '" data-act="mword" data-word="' + esc(card.word) + '"' + (card.state === "open" ? "" : " disabled") + '>' +
-      esc(card.word) + '<small>' + esc(sub) + '</small></button>';
-  }).join("");
-  const roots = m.roots.map((root) => {
-    const r = rootById(root.id);
-    let cls = "chip";
-    if (root.state === "right" || root.state === "shown") cls += " right";
-    if (root.state === "wrong") cls += " wrong";
-    const extra = root.word ? "<small>Matches " + esc(root.word) + "</small>" : "<small>" + esc(r.lang) + "</small>";
-    return '<button class="' + cls + '" data-act="mroot" data-root="' + esc(root.id) + '"' + (root.state === "open" ? "" : " disabled") + '>' +
-      esc(r.name) + " · " + esc(r.meaning) + extra + '</button>';
-  }).join("");
-  const done = m.words.every((card) => card.state !== "open");
-  return shell(
-    nav(ui.practice ? "Practice" : "Root match", "Set " + (ui.index + 1) + " / " + ui.queue.length) +
-    '<div class="card">' +
-      '<p class="tag">Match a word to its root</p>' +
-      '<p class="prompt">Tap a word, then tap the root it comes from.</p>' +
-      (ui.note ? '<p class="hint">' + esc(ui.note) + '</p>' : "") +
-      '<p class="match-label">Words</p>' + words +
-      '<p class="match-label">Roots</p>' + roots +
-      feedbackHTML() +
-    '</div>' +
-    (done ? '<div class="actions"><button class="primary" data-act="next">' + (ui.index + 1 >= ui.queue.length ? "See results" : "Next set") + '</button></div>' : "")
-  );
+function avatar(hat, px) {
+  const extra = {
+    laurel: '<ellipse cx="40" cy="24" rx="24" ry="8" fill="none" stroke="#3d8f4a" stroke-width="3"/>',
+    helm: '<path d="M16 38 Q40 6 64 38 L58 30 Q40 16 22 30 Z" fill="#8d7a62" stroke="#3a2a18"/>',
+    crest: '<path d="M40 6 L48 30 L32 30 Z" fill="#f0c14a"/>',
+    bolt: '<path d="M50 6 L40 24 L50 24 L36 46 L56 20 L46 20 Z" fill="#7ecbff"/>',
+    crown: '<path d="M18 32 L26 12 L40 26 L54 12 L62 32 Z" fill="#f0c14a" stroke="#8a6418"/>'
+  }[hat] || "";
+  return '<svg class="ava" width="' + px + '" height="' + px + '" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="36" fill="#3a2418" stroke="#f0c14a" stroke-width="3"/><circle cx="40" cy="48" r="16" fill="#e6b48a"/><circle cx="34" cy="46" r="2.2" fill="#1a120c"/><circle cx="46" cy="46" r="2.2" fill="#1a120c"/><path d="M34 54 Q40 58 46 54" stroke="#1a120c" fill="none" stroke-width="1.6"/>' + extra + '</svg>';
 }
-
+function bossSVG(id) {
+  const tone = id === "l4-boss" ? "#12384a" : (id === "final" ? "#3a2a08" : "#4a1020");
+  const eye = id === "l4-boss" ? "#7ecbff" : "#f0c14a";
+  return '<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="' + tone + '" stroke="#f0c14a" stroke-width="4"/><path d="M28 78 Q60 18 92 78 L84 70 Q60 34 36 70 Z" fill="#1a0c10"/><circle cx="46" cy="62" r="6" fill="' + eye + '"/><circle cx="74" cy="62" r="6" fill="' + eye + '"/><path d="M42 84 Q60 98 78 84" stroke="#f0c14a" fill="none" stroke-width="3"/><path d="M22 46 L34 28 L46 44 L60 18 L74 44 L86 28 L98 46" fill="none" stroke="#e23d3d" stroke-width="3"/></svg>';
+}
+function starsHTML(n) {
+  let html = '<span class="stars" aria-label="' + n + ' stars">';
+  for (let i = 1; i <= 3; i++) html += '<span class="star ' + (i <= n ? "on" : "") + '">' + starSVG() + '</span>';
+  return html + "</span>";
+}
+function hud() {
+  const rank = rankInfo(save.xp);
+  const nextBit = rank.next ? "Next: " + rank.next : "Top rank";
+  return '<div class="hud">' + avatar(save.hat, 54) +
+    '<div><div class="rank">' + esc(rank.name) + '</div><div class="xp"><span style="width:' + Math.round(rank.pct * 100) + '%"></span></div><div class="xplabel">' + save.xp + ' XP. ' + esc(nextBit) + '</div></div>' +
+    '<div class="coins">' + coinSVG() + '<span>' + save.coins + '</span></div></div>';
+}
+function comboHTML() {
+  const mult = multOf(run.combo);
+  let flames = "";
+  for (let i = 1; i <= 4; i++) flames += '<i class="' + (run.combo >= i ? "on" : "") + '"></i>';
+  const hot = mult >= 2 ? " hot" : "";
+  return '<div class="combo" aria-label="Combo times ' + mult + '"><span class="flames">' + flames + '</span><span class="mult' + hot + '">x' + mult + '</span></div>';
+}
+function heartsHTML() {
+  let html = '<div class="hearts" aria-label="' + run.hearts + ' hearts">';
+  for (let i = 0; i < 3; i++) html += '<span class="heart ' + (i < run.hearts ? "full" : "") + '">' + heartSVG() + '</span>';
+  return html + "</div>";
+}
+function renderMap() {
+  const cur = currentId();
+  function node(id) {
+    const meta = LEVELS[id];
+    const open = isUnlocked(id);
+    const stars = starsOf(id);
+    const num = ORDER.indexOf(id) % 5;
+    const label = meta.kind === "boss" ? "!" : String((ORDER.indexOf(id) % 5) + 1);
+    const cls = "node" + (meta.kind === "boss" ? " boss" : "") + (id === cur ? " hot" : "");
+    return '<button class="' + cls + '" data-act="level" data-id="' + id + '"' + (open ? "" : " disabled") + '>' +
+      '<span class="medal">' + (open ? label : "•") + '</span>' +
+      '<span><b>' + esc(meta.name) + '</b><em>' + esc(meta.blurb) + '</em></span>' +
+      starsHTML(stars) + '</button>';
+  }
+  const l3 = ["l3-def", "l3-root", "l3-blank", "l3-usage", "l3-boss"].map(node).join("");
+  const l4open = isUnlocked("l4-def");
+  const l4 = ["l4-def", "l4-root", "l4-blank", "l4-usage", "l4-boss"].map(node).join("");
+  const rivals = save.rematch.length;
+  return hud() +
+    '<div class="hero"><p class="tagline">Arena of Roots</p><h1>All or Nothing</h1><p class="how">Climb the gates. Fast answers pay more. A streak lights the combo meter.</p></div>' +
+    '<button class="bolt" data-act="lightning"><span>Lightning Round<small>60 seconds. Best ' + (save.lightningBest || 0) + '</small></span><span>GO</span></button>' +
+    '<section class="world world-all"><h2>The All Gate</h2><p class="sub">Lesson 3. Power, the whole, and what is shut.</p><div class="path">' + l3 + '</div></section>' +
+    '<section class="world world-none"><h2>The Nothing Gate</h2><p class="sub">' + (l4open ? "Lesson 4. Beginnings, nothing, and what is open." : "Locked until the Titan of All falls.") + '</p><div class="path">' + l4 + '</div></section>' +
+    '<section class="world world-final"><h2>The Colosseum</h2><p class="sub">Final boss. Both lessons in one fight.</p><div class="path">' + node("final") + '</div></section>' +
+    '<button class="bounty" data-act="rematch"' + (rivals ? "" : " disabled") + '><b>Rematch bounty</b><span>' + (rivals ? rivals + ' missed questions. Double coins.' : 'Miss a question and it waits here, worth double coins.') + '</span></button>' +
+    '<div class="footer-row"><button class="ghost" data-act="study">Study Hall</button><button class="ghost" data-act="shop">Shop</button></div>';
+}
+function questionBody(q) {
+  const word = q.word ? '<h3 class="wordbig">' + esc(q.word) + '</h3>' : '';
+  const prompt = q.prompt ? '<p>"' + esc(q.prompt) + '"</p>' : '';
+  let sentence = "";
+  if (q.type === "blank") {
+    const shown = ui.answered
+      ? rich(q.sentence).replace("_____", '<span class="gap">' + esc(q.show) + '</span>')
+      : rich(q.sentence).replace("_____", '<span class="gap">&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+    sentence = '<p>' + shown + '</p>';
+  }
+  let choices = "";
+  if (q.type === "mc") {
+    choices = '<div class="choices">' + q.choices.map((c, i) => {
+      let cls = "choice";
+      if (ui.answered && c.correct) cls += " is-right";
+      else if (ui.answered && ui.picked === i) cls += " is-wrong";
+      return '<button class="' + cls + '" data-act="pick" data-i="' + i + '"' + (ui.answered ? " disabled" : "") + '><span class="letter">' + LETTERS[i] + '</span>' + esc(c.text) + '</button>';
+    }).join("") + '</div>';
+  } else if (q.type === "usage") {
+    choices = '<div class="choices">' + q.options.map((c, i) => {
+      let cls = "choice";
+      if (ui.answered && c.bad) cls += " is-right";
+      else if (ui.answered && ui.picked === i && !c.bad) cls += " is-wrong";
+      return '<button class="' + cls + '" data-act="usage" data-i="' + i + '"' + (ui.answered ? " disabled" : "") + '><span class="letter">' + LETTERS[i] + '</span>' + esc(c.text) + '</button>';
+    }).join("") + '</div>';
+  }
+  const input = (q.type === "blank" && !ui.answered)
+    ? '<input class="blankbox" id="blank" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type the word" value="' + esc(ui.blank) + '">'
+    : "";
+  const fb = ui.feedback
+    ? '<div class="feedback ' + (ui.feedback.ok ? "good" : "bad") + '" role="status"><p class="fk">' + (ui.feedback.ok ? "Correct" : "Not quite") + '</p><p>' + esc(ui.feedback.text) + '</p></div>'
+    : "";
+  return '<div class="scroll"><p class="kicker">' + esc(q.heading) + '</p>' + word + prompt + sentence + '</div>' + choices + input + fb;
+}
 function renderPlay() {
-  const item = currentItem();
-  if (!item) return renderResults();
-  if (item.mode === "flash") return renderFlash(item);
-  if (item.mode === "mc") return renderMc(item);
-  if (item.mode === "blank") return renderBlank(item);
-  if (item.mode === "usage") return renderUsage(item);
-  if (item.mode === "roots") return renderRoots();
-  return renderEmpty();
+  const q = current();
+  if (!q) return renderMap();
+  const timed = run.kind !== "lightning" && run.kind !== "drill";
+  const timeLabel = run.kind === "lightning"
+    ? Math.max(0, Math.ceil((ui.lightEnds - Date.now()) / 1000))
+    : (timed ? timeFor(q) : "");
+  let boss = "";
+  if (run.kind === "boss") {
+    const pct = run.maxHp ? Math.round(run.hp / run.maxHp * 100) : 0;
+    boss = '<p class="bossname">' + esc(run.name) + '</p>' +
+      '<div class="boss-wrap ' + (run.justHit ? "hit" : "") + (run.justHurt ? " hurt" : "") + '">' + bossSVG(run.levelId) + '<div class="slash"></div></div>' +
+      '<div class="hplabel"><span>HP ' + run.hp + '/' + run.maxHp + '</span></div>' +
+      '<div class="hp"><span style="width:' + pct + '%"></span></div>';
+  }
+  const step = (run.index + 1) + "/" + (run.kind === "lightning" ? "GO" : run.queue.length);
+  let nextLabel = "Next";
+  if (ui.answered && run.kind === "boss" && run.hp <= 0) nextLabel = "Victory";
+  else if (ui.answered && run.kind === "boss" && (run.hearts <= 0 || run.index + 1 >= run.queue.length)) nextLabel = "See the fall";
+  else if (ui.answered && run.index + 1 >= run.queue.length && run.kind !== "lightning") nextLabel = "Claim reward";
+  const check = (q.type === "blank" && !ui.answered)
+    ? '<button class="primary" id="check" data-act="check"' + (ui.blank.trim() ? "" : " disabled") + '>Lock it in</button>'
+    : "";
+  const next = (ui.answered && run.kind !== "lightning") ? '<button class="primary" data-act="next">' + nextLabel + '</button>' : "";
+  return '<div class="playtop"><button class="ghost" data-act="retreat" style="min-height:44px;padding:8px 10px">Retreat</button>' +
+    comboHTML() + '<span class="timenum" id="timenum">' + timeLabel + '</span></div>' +
+    (run.kind === "boss" ? '<div class="playtop">' + heartsHTML() + '<b>' + run.score + '</b></div>' : '<div class="playtop"><b>' + esc(run.name) + '</b><span>' + step + ' | ' + run.score + '</span></div>') +
+    (timed ? '<div class="timer" id="timer"><span id="timebar"></span></div>' : '') +
+    boss + questionBody(q) + '<div class="actions">' + check + next + '</div>';
 }
-
-function renderResults() {
-  const moreMc = ui.mode === "mc" && !ui.practice && decks.mc.length > 0;
-  const againLabel = ui.practice ? "Practice again" : "Play again";
-  const againAct = ui.practice ? "practice" : "start";
-  const againMode = ui.practice ? "" : ui.mode;
-  return shell(
-    nav("Round complete", "") +
-    '<div class="card">' +
-      '<p class="tag">This round</p>' +
-      '<p class="end-score">' + ui.roundCorrect + '<span style="font-size:1.3rem;color:var(--muted)"> / ' + ui.roundTotal + '</span></p>' +
-      '<p class="prompt">Streak now ' + save.stats.streak + '. Best streak ' + save.stats.bestStreak + '.</p>' +
-      '<p class="note">Missed items are saved in the practice queue.</p>' +
-    '</div>' +
-    '<div class="actions">' +
-      (moreMc ? '<button class="primary" data-act="start" data-mode="mc">Keep going</button>' : "") +
-      '<button class="' + (moreMc ? "ghost" : "primary") + '" data-act="' + againAct + '" data-mode="' + esc(againMode) + '" data-fresh="1">' + againLabel + '</button>' +
-      (!ui.practice && missedInScope().length ? '<button class="ghost" data-act="practice">Practice missed (' + missedInScope().length + ')</button>' : "") +
-      '<button class="ghost" data-act="home">Home</button>' +
-    '</div>'
-  );
+function renderResult() {
+  const title = run.kind === "lightning"
+    ? (run.record ? "New record" : "Time")
+    : (run.win ? (run.kind === "boss" ? "Boss down" : "Gate cleared") : "Fallen");
+  const starBlock = (run.kind === "level" || run.kind === "boss")
+    ? '<div class="result-stars">' + [1, 2, 3].map((i) => '<span class="star ' + (i <= run.stars ? "on" : "") + '">' + starSVG() + '</span>').join("") + '</div>'
+    : "";
+  const rankBanner = run.rankedUp ? '<div class="banner">Rank up: ' + esc(run.rankName) + '</div>' : "";
+  const acc = run.total ? Math.round(run.correct / run.total * 100) : 0;
+  return hud() + '<div class="hero"><p class="tagline">' + esc(run.name || "") + '</p><h1>' + esc(title) + '</h1></div>' +
+    rankBanner + starBlock +
+    '<p class="scorebig">' + run.score + '</p>' +
+    '<p class="how" style="text-align:center">' + run.correct + ' of ' + run.total + ' correct (' + acc + '%). Best combo x' + multOf(run.bestCombo) + '.<br>' +
+    '+' + run.coinGain + ' coins. +' + run.xpGain + ' XP.' +
+    (run.kind === "lightning" ? ' Arena best ' + save.lightningBest + '.' : '') +
+    (run.kind === "boss" && !run.win ? ' The boss keeps the purse. Hearts hit zero or the questions ran out.' : '') +
+    '</p>' +
+    '<div class="actions"><button class="primary" data-act="map">Back to the arena</button>' +
+    (run.levelId && run.levelId !== "lightning" && run.levelId !== "drill" ? '<button class="ghost" data-act="retry">Fight again</button>' : '') +
+    '</div>';
 }
-
-function renderStudy() {
+function renderShop() {
+  const hats = HATS.map((item) => {
+    const owned = save.ownedHats.includes(item.id);
+    const on = save.hat === item.id;
+    const label = on ? "Wearing" : (owned ? "Wear" : item.price + " coins");
+    return '<button class="shopitem' + (on ? " on" : "") + '" data-act="hat" data-id="' + item.id + '">' + avatar(item.id, 48) +
+      '<span><b>' + esc(item.name) + '</b><em style="display:block;color:var(--muted);font-style:normal;font-size:.8rem">' + esc(item.blurb) + '</em></span>' +
+      '<span style="margin-left:auto;font-weight:800;color:var(--gold)">' + label + '</span></button>';
+  }).join("");
+  const themes = THEMES.map((item) => {
+    const owned = save.ownedThemes.includes(item.id);
+    const on = save.theme === item.id;
+    const label = on ? "On" : (owned ? "Use" : item.price + " coins");
+    return '<button class="shopitem' + (on ? " on" : "") + '" data-act="theme" data-id="' + item.id + '">' +
+      '<span class="swatch" style="background:' + item.color + '"></span><b>' + esc(item.name) + '</b>' +
+      '<span style="margin-left:auto;font-weight:800;color:var(--gold)">' + label + '</span></button>';
+  }).join("");
+  return hud() + '<div class="hero"><p class="tagline">Armory</p><h1>Shop</h1><p class="how">Coins buy hats and arena colors. They do not buy answers.</p></div>' +
+    '<h2 class="world" style="margin-bottom:6px">Hats</h2><div class="shopgrid">' + hats + '</div>' +
+    '<h2 style="margin:14px 0 6px;font-family:var(--serif)">Arena colors</h2><div class="shopgrid">' + themes + '</div>' +
+    '<div class="actions"><button class="primary" data-act="map">Back to the arena</button></div>';
+}
+function renderStudyHome() {
+  return hud() + '<div class="hero"><p class="tagline">Secondary</p><h1>Study Hall</h1><p class="how">Review all 22 words without the clock. Misses still join the rematch pile.</p></div>' +
+    '<div class="choices">' +
+    '<button class="choice" data-act="browse"><span class="letter">1</span>Word scrolls</button>' +
+    '<button class="choice" data-act="cards"><span class="letter">2</span>Flashcards</button>' +
+    '<button class="choice" data-act="drill"><span class="letter">3</span>Quiet drill</button>' +
+    '</div><p class="how">Rematch pile: ' + save.rematch.length + '. Known cards: ' + Object.keys(save.known).filter((k) => save.known[k] === "known").length + '.</p>' +
+    '<div class="actions"><button class="ghost" data-act="rematch"' + (save.rematch.length ? "" : " disabled") + '>Open rematch</button><button class="primary" data-act="map">Back to the arena</button><button class="linkish" data-act="reset">Reset saved progress</button></div>';
+}
+function renderBrowse() {
   const q = ui.query.trim().toLowerCase();
-  const lessons = save.lesson === "both" ? [3, 4] : [Number(save.lesson)];
+  const lessons = ui.studyLesson === "both" ? [3, 4] : [Number(ui.studyLesson)];
   let blocks = "";
   lessons.forEach((lesson) => {
-    const roots = ROOTS.filter((r) => r.lesson === lesson);
     let inner = "";
-    roots.forEach((r) => {
+    ROOTS.filter((r) => r.lesson === lesson).forEach((r) => {
       const words = WORDS.filter((w) => w.root === r.id).filter((w) => {
         if (!q) return true;
-        const blob = (w.word + " " + w.defs.join(" ") + " " + r.name + " " + r.meaning).toLowerCase();
-        return blob.includes(q);
+        return (w.word + " " + w.defs.join(" ") + " " + r.name + " " + r.meaning).toLowerCase().includes(q);
       });
-      if (q && !words.length) return;
+      if (!words.length) return;
       const familiar = r.familiar.length ? "Familiar: " + r.familiar.join(", ") + ". " : "";
       const challenge = r.challenge.length ? "Also from this root: " + r.challenge.join(", ") + "." : "";
       const cards = words.map((w) => {
         const open = ui.openWord === w.word;
         const mark = save.known[w.word] === "known" ? "Known" : (save.known[w.word] === "practice" ? "Practice" : "");
-        const detail = open ? (
-          '<div class="detail">' +
-            w.defs.map((d) => '<p>' + esc(d) + '</p>').join("") +
-            '<p><span class="pill">' + esc(r.name) + '</span> ' + esc(r.lang) + ' for ' + esc(r.meaning) + '</p>' +
-            w.examples.map((ex) => '<p>' + esc(ex) + '</p>').join("") +
-            (w.forms.length ? '<p>Forms: ' + esc(w.forms.join(", ")) + '</p>' : "") +
-            (w.note ? '<p>' + esc(w.note) + '</p>' : "") +
-            '<div class="row">' +
-              '<button class="ghost" data-act="study-practice" data-word="' + esc(w.word) + '">Needs practice</button>' +
-              '<button class="primary" data-act="study-known" data-word="' + esc(w.word) + '">Mark known</button>' +
-            '</div>' +
-          '</div>'
-        ) : "";
-        return '<button class="wordbtn" data-act="open" data-word="' + esc(w.word) + '">' +
-          '<span class="w">' + esc(w.word) + '</span><span class="s">' + esc(w.pos) + (w.challenge ? " · Challenge" : "") + (mark ? " · " + mark : "") + '</span>' +
-          '</button>' + detail;
+        const detail = open ? '<div class="detail">' + w.defs.map((d) => '<p>' + esc(d) + '</p>').join("") +
+          '<p>' + esc(r.lang) + ' root ' + esc(r.name) + ' means ' + esc(r.meaning) + '.</p>' +
+          w.examples.map((ex) => '<p>' + esc(ex) + '</p>').join("") +
+          (w.forms.length ? '<p>Forms: ' + esc(w.forms.join(", ")) + '</p>' : '') +
+          (w.note ? '<p>' + esc(w.note) + '</p>' : '') +
+          '<div class="footer-row"><button class="ghost" data-act="learn" data-word="' + esc(w.word) + '">Still learning</button><button class="primary" data-act="know" data-word="' + esc(w.word) + '">I know this</button></div></div>' : "";
+        return '<button class="wordbtn" data-act="open" data-word="' + esc(w.word) + '"><b>' + esc(w.word) + '</b> <span style="color:var(--muted)">' + esc(w.pos) + (mark ? " · " + mark : "") + '</span></button>' + detail;
       }).join("");
-      inner += '<article class="root-block"><div class="root-head"><h3>' + esc(r.parts) + '</h3>' +
-        '<p>' + esc(r.lang) + ' for "' + esc(r.meaning) + '."</p>' +
-        (r.note ? '<p>' + esc(r.note) + '</p>' : "") +
-        '<p>' + esc((familiar + challenge).trim()) + '</p></div>' + cards + '</article>';
+      inner += '<div class="root-head" style="margin-top:12px"><b style="color:var(--gold)">' + esc(r.parts) + '</b><div class="how">' + esc(r.lang) + ' for "' + esc(r.meaning) + '." ' + esc((r.note ? r.note + " " : "") + familiar + challenge) + '</div></div>' + cards;
     });
-    if (inner) blocks += '<h2 class="lesson-head">Lesson ' + lesson + '</h2>' + inner;
+    if (inner) blocks += '<h2 style="font-family:var(--serif);margin:14px 0 0">Lesson ' + lesson + '</h2>' + inner;
   });
-  if (!blocks) blocks = '<div class="card"><p class="prompt">No words match that search.</p></div>';
-  return shell(
-    nav("Study", scopedWords().length + " words") +
-    '<input class="search" id="search" placeholder="Search words or meanings" value="' + esc(ui.query) + '">' +
-    blocks
-  );
+  if (!blocks) blocks = '<p class="how">No words match that search.</p>';
+  return '<div class="playtop"><button class="ghost" data-act="study" style="min-height:44px">Hall</button><b>Word scrolls</b><span>' + WORDS.length + '</span></div>' +
+    '<div class="seg"><button data-act="slesson" data-lesson="3" aria-pressed="' + (ui.studyLesson === "3") + '">Lesson 3</button><button data-act="slesson" data-lesson="4" aria-pressed="' + (ui.studyLesson === "4") + '">Lesson 4</button><button data-act="slesson" data-lesson="both" aria-pressed="' + (ui.studyLesson === "both") + '">Both</button></div>' +
+    '<input class="search" id="search" placeholder="Search words" value="' + esc(ui.query) + '">' + blocks;
 }
-
-let lastNav = "";
-
+function renderCards() {
+  const w = wordByName(ui.flash[ui.flashIndex]);
+  if (!w) return renderStudyHome();
+  const r = rootById(w.root);
+  const front = '<div class="face front" data-act="flip" role="button" tabindex="0"><p class="kicker" style="color:var(--gold)">Lesson ' + w.lesson + '</p><h3 class="wordbig">' + esc(w.word) + '</h3><p>' + esc(w.pos) + '</p><p class="how">Tap the card.</p></div>';
+  const back = '<div class="face back"><p class="kicker" style="color:var(--gold)">' + esc(w.word) + '</p>' +
+    w.defs.map((d) => '<p>' + esc(d) + '</p>').join("") +
+    '<p class="how">' + esc(r.name) + ', ' + esc(r.lang) + ', ' + esc(r.meaning) + '</p>' +
+    w.examples.map((ex) => '<p>' + esc(ex) + '</p>').join("") +
+    '<div class="footer-row" style="margin-top:10px"><button class="ghost" data-act="card-learn" data-stop="1">Still learning</button><button class="primary" data-act="card-know" data-stop="1">I know this</button></div></div>';
+  return '<div class="playtop"><button class="ghost" data-act="study" style="min-height:44px">Hall</button><b>Flashcards</b><span>' + (ui.flashIndex + 1) + '/' + ui.flash.length + '</span></div>' +
+    '<div class="flip' + (ui.flipped ? ' is-flipped' : '') + '"><div class="flip-inner">' + front + back + '</div></div>';
+}
 function render() {
+  document.documentElement.dataset.theme = save.theme || "marble";
   const app = document.getElementById("app");
   let html = "";
-  if (ui.screen === "home") html = renderHome();
-  else if (ui.screen === "study") html = renderStudy();
-  else if (ui.screen === "empty") html = renderEmpty();
-  else if (ui.screen === "results") html = renderResults();
-  else html = renderPlay();
+  if (ui.screen === "map") html = renderMap();
+  else if (ui.screen === "play") html = renderPlay();
+  else if (ui.screen === "result") html = renderResult();
+  else if (ui.screen === "shop") html = renderShop();
+  else if (ui.screen === "study") html = renderStudyHome();
+  else if (ui.screen === "browse") html = renderBrowse();
+  else if (ui.screen === "cards") html = renderCards();
+  else html = renderMap();
   app.innerHTML = html;
-  const navKey = ui.screen + "|" + ui.mode + "|" + ui.index;
-  if (navKey !== lastNav) {
-    window.scrollTo(0, 0);
-    lastNav = navKey;
+  if (ui.screen === "play" && run && !run.over && !ui.answered) {
+    armTimer();
+    armLightning();
   }
   const blank = document.getElementById("blank");
   if (blank) blank.focus();
   const search = document.getElementById("search");
-  if (search && ui.screen === "study" && document.activeElement !== search) {
-    /* keep typed value; do not steal focus after every toggle */
+  if (search && ui.screen === "browse" && document.activeElement && document.activeElement.id !== "search") {
+    /* leave focus alone unless the search event restores it */
   }
 }
-
+function buyOrEquip(listName, ownedName, field, id) {
+  const list = listName === "hat" ? HATS : THEMES;
+  const item = list.find((entry) => entry.id === id);
+  if (!item) return;
+  const owned = save[ownedName];
+  if (!owned.includes(id)) {
+    if (save.coins < item.price) { toast("Not enough coins yet."); return; }
+    save.coins -= item.price;
+    owned.push(id);
+  }
+  save[field] = id;
+  persist();
+  render();
+}
+function markWord(word, kind) {
+  save.known[word] = kind;
+  const w = wordByName(word);
+  if (!w) return;
+  const q = makeDef(w, w.defs[0]);
+  if (kind === "known") save.rematch = save.rematch.filter((r) => r.uid !== q.uid);
+  else if (!save.rematch.some((r) => r.uid === q.uid)) save.rematch.push(q);
+  persist();
+}
 document.body.addEventListener("click", (event) => {
   const btn = event.target.closest("[data-act]");
-  if (!btn) return;
-  if (btn.dataset.stop) event.stopPropagation();
+  if (!btn || btn.disabled) return;
   const act = btn.dataset.act;
-  if (act === "lesson") setLesson(btn.dataset.lesson);
-  else if (act === "start") {
-    if (btn.dataset.fresh === "1") decks.mc = [];
-    startMode(btn.dataset.mode, false);
-  }
-  else if (act === "practice") startMode("practice", true);
-  else if (act === "home") goHome();
-  else if (act === "reset") resetProgress();
-  else if (act === "flip") {
-    if (event.target.closest("[data-stop]")) return;
-    ui.flipped = !ui.flipped;
+  if (act === "level") startLevel(btn.dataset.id);
+  else if (act === "lightning") startLightning();
+  else if (act === "rematch") startLevel("rematch");
+  else if (act === "retreat" || act === "map") retreat();
+  else if (act === "retry") startLevel(run.levelId);
+  else if (act === "shop") { clearAll(); ui.screen = "shop"; render(); }
+  else if (act === "study") { clearAll(); ui.screen = "study"; render(); }
+  else if (act === "browse") { ui.screen = "browse"; render(); }
+  else if (act === "cards") {
+    ui.flash = shuffle(WORDS.map((w) => w.word));
+    ui.flashIndex = 0;
+    ui.flipped = false;
+    ui.screen = "cards";
     render();
   }
-  else if (act === "know") onKnow("known");
-  else if (act === "learn") onKnow("practice");
-  else if (act === "choose") onChoose(Number(btn.dataset.i));
-  else if (act === "usage") onUsage(Number(btn.dataset.i));
-  else if (act === "check") onBlank();
-  else if (act === "next") advance();
-  else if (act === "mword") onMatchWord(btn.dataset.word);
-  else if (act === "mroot") onMatchRoot(btn.dataset.root);
-  else if (act === "open") toggleOpen(btn.dataset.word);
-  else if (act === "study-known") markStudy(btn.dataset.word, "known");
-  else if (act === "study-practice") markStudy(btn.dataset.word, "practice");
+  else if (act === "drill") startDrill();
+  else if (act === "slesson") { ui.studyLesson = btn.dataset.lesson; render(); }
+  else if (act === "open") { ui.openWord = ui.openWord === btn.dataset.word ? null : btn.dataset.word; render(); }
+  else if (act === "know") { markWord(btn.dataset.word, "known"); render(); }
+  else if (act === "learn") { markWord(btn.dataset.word, "practice"); render(); }
+  else if (act === "flip") { ui.flipped = !ui.flipped; render(); }
+  else if (act === "card-know" || act === "card-learn") {
+    const w = ui.flash[ui.flashIndex];
+    markWord(w, act === "card-know" ? "known" : "practice");
+    ui.flipped = false;
+    ui.flashIndex += 1;
+    if (ui.flashIndex >= ui.flash.length) ui.screen = "study";
+    render();
+  }
+  else if (act === "hat") buyOrEquip("hat", "ownedHats", "hat", btn.dataset.id);
+  else if (act === "theme") buyOrEquip("theme", "ownedThemes", "theme", btn.dataset.id);
+  else if (act === "pick") {
+    if (ui.answered) return;
+    const q = current();
+    const i = Number(btn.dataset.i);
+    ui.picked = i;
+    const choice = q.choices[i];
+    resolve(!!choice.correct, choice.correct ? q.explain : "The answer is " + q.answer + ". " + q.explain);
+  }
+  else if (act === "usage") {
+    if (ui.answered) return;
+    const q = current();
+    const i = Number(btn.dataset.i);
+    ui.picked = i;
+    const opt = q.options[i];
+    resolve(!!opt.bad, q.explain);
+  }
+  else if (act === "check") {
+    const q = current();
+    const graded = gradeBlank(q, ui.blank);
+    if (graded.empty) return;
+    resolve(graded.ok, graded.text + " " + filledSentence(q).replace(/\*/g, ""));
+  }
+  else if (act === "next") goNext(false);
+  else if (act === "reset") {
+    if (!confirm("Clear arena progress on this device?")) return;
+    save = defaultSave();
+    persist();
+    localStorage.removeItem(KEY);
+    ui.screen = "map";
+    render();
+  }
 });
-
 document.body.addEventListener("input", (event) => {
   if (event.target.id === "blank") {
     ui.blank = event.target.value;
@@ -1776,48 +1611,42 @@ document.body.addEventListener("input", (event) => {
     const pos = event.target.selectionStart;
     render();
     const again = document.getElementById("search");
-    if (again) {
-      again.focus();
-      again.setSelectionRange(pos, pos);
-    }
+    if (again) { again.focus(); again.setSelectionRange(pos, pos); }
   }
 });
-
 document.body.addEventListener("keydown", (event) => {
   if (event.target && event.target.id === "blank" && event.key === "Enter") {
     event.preventDefault();
-    onBlank();
+    const q = current();
+    if (!q) return;
+    const graded = gradeBlank(q, ui.blank);
+    if (!graded.empty) resolve(graded.ok, graded.text + " " + filledSentence(q).replace(/\*/g, ""));
     return;
   }
   if (event.target && (event.target.id === "search" || event.target.id === "blank")) return;
   if (ui.screen === "play" && !ui.answered && /^[1-4]$/.test(event.key)) {
-    const item = currentItem();
-    if (!item) return;
+    const q = current();
     const index = Number(event.key) - 1;
-    if (item.mode === "mc" && item.choices[index]) onChoose(index);
-    if (item.mode === "usage" && item.options[index]) onUsage(index);
-  }
-  if (event.key === "Enter" && event.target && event.target.dataset && event.target.dataset.act === "flip") {
-    ui.flipped = !ui.flipped;
-    render();
+    if (q && q.type === "mc" && q.choices[index]) {
+      ui.picked = index;
+      const choice = q.choices[index];
+      resolve(!!choice.correct, choice.correct ? q.explain : "The answer is " + q.answer + ". " + q.explain);
+    }
+    if (q && q.type === "usage" && q.options[index]) {
+      ui.picked = index;
+      resolve(!!q.options[index].bad, q.explain);
+    }
   }
 });
-
-window.addEventListener("popstate", () => {
-  pushed = false;
-  showHome();
-});
-
-try { history.replaceState({ mode: false }, ""); } catch (err) { /* opened as a file */ }
-window.__quiz = {
+document.documentElement.dataset.theme = save.theme || "marble";
+window.__game = {
+  get save() { return save; },
+  get run() { return run; },
+  get ui() { return ui; },
+  get q() { return current(); },
   gradeBlank: gradeBlank,
-  words: WORDS,
-  roots: ROOTS,
-  blanks: BLANKS,
-  synonyms: SYNONYMS,
-  antonyms: ANTONYMS,
-  usage: USAGE,
-  ui: ui
+  WORDS: WORDS,
+  isUnlocked: isUnlocked
 };
 render();
 </script>
